@@ -1,0 +1,9 @@
+*.nes
+*.log
+# Stuff that pdavies uses
+EMUTools/
+FCEUx/
+dkong/
+smb/
+fxruby_test.rb
+nestech.txt
