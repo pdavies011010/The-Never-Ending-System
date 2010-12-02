@@ -8,8 +8,6 @@ public class MMC {
 	private byte[] cartridgeBankLo = new byte[Constants.CARTRIDGE_BANK_SIZE];
 	private byte[] cartridgeBankHi = new byte[Constants.CARTRIDGE_BANK_SIZE];
 
-	private boolean patternTable0Writable, patternTable1Writable;
-	
 	private byte[] patternTable0 = new byte[Constants.PATTERN_TABLE_SIZE];
 	private byte[] patternTable1 = new byte[Constants.PATTERN_TABLE_SIZE];
 	private byte[] nameTable0 = new byte[Constants.NAME_TABLE_SIZE];
@@ -24,9 +22,22 @@ public class MMC {
 	private byte[] spritePalette = new byte[Constants.PALETTE_SIZE];
 	private byte[] spriteMem = new byte[Constants.SPRITE_MEM_SIZE];
 	
+	private boolean patternTable0Writable, patternTable1Writable;
+	private boolean screenScrollRegSwitch, ppuMemAddressRegSwitch;
+	private boolean joystickLatchStarted;
+	private byte joystick1Keys, joystick2Keys;
+	private byte joystick1LatchKeys, joystick2LatchKeys;
+	
 	public MMC() {
 		patternTable0Writable = false;
 		patternTable1Writable = false;
+		screenScrollRegSwitch = false;
+		ppuMemAddressRegSwitch = false;
+		joystickLatchStarted = false;
+		joystick1Keys = 0;
+		joystick2Keys = 0;
+		joystick1LatchKeys = 0;
+		joystick2LatchKeys = 0;
 	}
 	
 	public byte[] getCpuRam() {
