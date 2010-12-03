@@ -107,4 +107,76 @@ public class MMC {
 	public byte[] getSpriteMem() {
 		return spriteMem;
 	}
+	
+	public boolean isPatternTable0Writable() {
+		return patternTable0Writable;
+	}
+	
+	public void setPatternTable0Writable(boolean patternTable0Writable) {
+		this.patternTable0Writable = patternTable0Writable;
+	}
+	
+	public boolean isPatternTable1Writable() {
+		return patternTable1Writable;
+	}
+	
+	public void setPatternTable1Writable(boolean patternTable1Writable) {
+		this.patternTable1Writable = patternTable1Writable;
+	}
+	
+	public boolean getScreenScrollRegSwitch() {
+		return screenScrollRegSwitch;
+	}
+	
+	public void setScreenScrollRegSwitch(boolean screenScrollRegSwitch) {
+		this.screenScrollRegSwitch = screenScrollRegSwitch;
+	}
+	
+	public boolean getPPUMemAddressRegSwitch() {
+		return ppuMemAddressRegSwitch;
+	}
+	
+	public void setPPUMemAddressRegSwitch(boolean ppuMemAddressRegSwitch) {
+		this.ppuMemAddressRegSwitch = ppuMemAddressRegSwitch;
+	}
+	
+	public boolean isJoystickLatchStarted() {
+		return joystickLatchStarted;
+	}
+	
+	public void setJoystickLatchStarted(boolean joystickLatchStarted) {
+		this.joystickLatchStarted = joystickLatchStarted;
+	}
+	
+	public byte getJoystick1Keys() {
+		return joystick1Keys;
+	}
+	
+	public void setJoystick1Keys(byte joystick1Keys) {
+		this.joystick1Keys = joystick1Keys;
+	}
+	
+	public byte getJoystick2Keys() {
+		return joystick2Keys;
+	}
+	
+	public void setJoystick2Keys(byte joystick2Keys) {
+		this.joystick2Keys = joystick2Keys;
+	}
+	
+	public byte getJoystick1LatchKeys() {
+		return joystick1LatchKeys;
+	}
+	
+	public void setJoystick1LatchKeys(byte joystick1LatchKeys) {
+		this.joystick1LatchKeys = joystick1LatchKeys;
+	}
+	
+	public byte getJoystick2LatchKeys() {
+		return joystick2LatchKeys;
+	}
+	
+	public void setJoystick2LatchKeys(byte joystick2LatchKeys) {
+		this.joystick2LatchKeys = joystick2LatchKeys;
+	}
 }
