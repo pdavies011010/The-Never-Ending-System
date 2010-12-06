@@ -110,4 +110,39 @@ public class PPU {
 	    // Vertical Read: PPU Address increments by 32 on read or write
 	    return ((controlReg1 & Constants.PPU_CTRL_1_VERTICAL_WRITE) != 0) ? true : false;
 	}
+	
+	public byte getBackgroundColorBits() {
+		byte result = (byte) (controlReg2 >> 5);
+		return result;
+	}
+	
+	public void set_background_color_bits(byte value) {
+		controlReg2 &= ~Constants.PPU_CTRL_2_BKG_COLOR_MASK;
+		controlReg2 |= (value << (byte) 5);
+	}
+	
+	public void updateBackgroundColor() {
+		byte color = getBackgroundColorBits();
+		
+		// Default to Black
+		byte backgroundColor = 0x0F;  
+    	switch(color) {
+    	case 0:
+    		//Palette Black
+        	backgroundColor = 0x0F;
+        	break;
+    	case 1:
+    		//Palette Blue
+    		backgroundColor = 0x01;
+    		break;
+    	case 2:
+    		//Palette Green
+    		backgroundColor = 0x09;
+    		break;
+    	case 4:
+    		//Palette Red
+    		backgroundColor = 0x06;
+    		break;
+    	}
+	}
 }
