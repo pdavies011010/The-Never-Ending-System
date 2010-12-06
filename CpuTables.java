@@ -7,18 +7,20 @@ public class CpuTables {
 	public Map<Short, Operation> OPERATIONS = new HashMap<Short, Operation>();
 	// Addressing Mode hash (ADDRESSING_MODES[opcode] -> addressing_mode)
 	public Map<Short, AddressingMode> ADDRESSING_MODES = new HashMap<Short, AddressingMode>();
-	// Cycle Count hashes (CYCLE_COUNTS[operation][addressing_mode] -> cycle_count)
+	// Cycle Count hashes (CYCLE_COUNTS[operation][addressing_mode] ->
+	// cycle_count)
 	public Map<Operation, Map<AddressingMode, Integer>> CYCLE_COUNTS = new HashMap<Operation, Map<AddressingMode, Integer>>();
-	// Byte Count hashes (instruction length) (BYTE_COUNTS[operation][addressing_mode] -> byte_count)
+	// Byte Count hashes (instruction length)
+	// (BYTE_COUNTS[operation][addressing_mode] -> byte_count)
 	public Map<Operation, Map<AddressingMode, Integer>> BYTE_COUNTS = new HashMap<Operation, Map<AddressingMode, Integer>>();
-	
-	/* 
-	*  TODO: This stuff should probably be kept in a properties file.
-	*/ 
+
+	/*
+	 * TODO: This stuff should probably be kept in a properties file.
+	 */
 	{
 		/*
-		*  Build map of Opcode -> Operation
-		*/
+		 * Build map of Opcode -> Operation
+		 */
 		OPERATIONS.put(Opcode.ADCI, Operation.ADC);
 		OPERATIONS.put(Opcode.ADCZ, Operation.ADC);
 		OPERATIONS.put(Opcode.ADCZX, Operation.ADC);
@@ -169,10 +171,10 @@ public class CpuTables {
 		OPERATIONS.put(Opcode.TSX, Operation.TSX);
 		OPERATIONS.put(Opcode.TXA, Operation.TXA);
 		OPERATIONS.put(Opcode.TXS, Operation.TXS);
-		
+
 		/*
-		* Build map of Opcode -> Addressing Mode
-		*/
+		 * Build map of Opcode -> Addressing Mode
+		 */
 		ADDRESSING_MODES.put(Opcode.ADCI, AddressingMode.IMMEDIATE);
 		ADDRESSING_MODES.put(Opcode.ANDI, AddressingMode.IMMEDIATE);
 		ADDRESSING_MODES.put(Opcode.CMPI, AddressingMode.IMMEDIATE);
@@ -324,22 +326,22 @@ public class CpuTables {
 		ADDRESSING_MODES.put(Opcode.BPL, AddressingMode.RELATIVE);
 		ADDRESSING_MODES.put(Opcode.BVC, AddressingMode.RELATIVE);
 		ADDRESSING_MODES.put(Opcode.BVS, AddressingMode.RELATIVE);
-		
+
 		/*
-		*  Build map of Operation/Addr. Mode -> Cycle count
-		*/
+		 * Build map of Operation/Addr. Mode -> Cycle count
+		 */
 		ChainedHashMap<AddressingMode, Integer> modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 3).set(AddressingMode.ZERO_PAGE_X_INDEXED, 4);
 		modeMap.set(AddressingMode.ABSOLUTE, 4).set(AddressingMode.ABSOLUTE_X_INDEXED, 4).set(AddressingMode.ABSOLUTE_Y_INDEXED, 4);
 		modeMap.set(AddressingMode.PRE_INDEXED_INDIRECT, 6).set(AddressingMode.POST_INDEXED_INDIRECT, 5);
 		CYCLE_COUNTS.put(Operation.ADC, modeMap);
-	
+
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 3).set(AddressingMode.ZERO_PAGE_X_INDEXED, 4);
 		modeMap.set(AddressingMode.ABSOLUTE, 4).set(AddressingMode.ABSOLUTE_X_INDEXED, 4).set(AddressingMode.ABSOLUTE_Y_INDEXED, 4);
 		modeMap.set(AddressingMode.PRE_INDEXED_INDIRECT, 6).set(AddressingMode.POST_INDEXED_INDIRECT, 5);
 		CYCLE_COUNTS.put(Operation.AND, modeMap);
-		
+
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.ACCUMULATOR, 2).set(AddressingMode.ZERO_PAGE, 5).set(AddressingMode.ZERO_PAGE_X_INDEXED, 6);
 		modeMap.set(AddressingMode.ABSOLUTE, 6).set(AddressingMode.ABSOLUTE_X_INDEXED, 7);
@@ -392,24 +394,24 @@ public class CpuTables {
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
 		CYCLE_COUNTS.put(Operation.CLD, modeMap);
-		
+
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
 		CYCLE_COUNTS.put(Operation.CLI, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
-		CYCLE_COUNTS.put(Operation.CLV, modeMap);  
+		CYCLE_COUNTS.put(Operation.CLV, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 3).set(AddressingMode.ZERO_PAGE_X_INDEXED, 4);
 		modeMap.set(AddressingMode.ABSOLUTE, 4).set(AddressingMode.ABSOLUTE_X_INDEXED, 4).set(AddressingMode.ABSOLUTE_Y_INDEXED, 4);
 		modeMap.set(AddressingMode.PRE_INDEXED_INDIRECT, 6).set(AddressingMode.POST_INDEXED_INDIRECT, 5);
-		CYCLE_COUNTS.put(Operation.CMP, modeMap);  
+		CYCLE_COUNTS.put(Operation.CMP, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 3).set(AddressingMode.ABSOLUTE, 4);
-		CYCLE_COUNTS.put(Operation.CPX, modeMap);  
+		CYCLE_COUNTS.put(Operation.CPX, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 3).set(AddressingMode.ABSOLUTE, 4);
@@ -426,7 +428,7 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
-		CYCLE_COUNTS.put(Operation.DEY, modeMap); 
+		CYCLE_COUNTS.put(Operation.DEY, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 3).set(AddressingMode.ZERO_PAGE_X_INDEXED, 4);
@@ -445,7 +447,7 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
-		CYCLE_COUNTS.put(Operation.INY, modeMap); 
+		CYCLE_COUNTS.put(Operation.INY, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.ABSOLUTE, 3).set(AddressingMode.INDIRECT, 5);
@@ -478,7 +480,7 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
-		CYCLE_COUNTS.put(Operation.NOP, modeMap); 
+		CYCLE_COUNTS.put(Operation.NOP, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 3).set(AddressingMode.ZERO_PAGE_X_INDEXED, 4);
@@ -488,19 +490,19 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 3);
-		CYCLE_COUNTS.put(Operation.PHA, modeMap); 
+		CYCLE_COUNTS.put(Operation.PHA, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 3);
-		CYCLE_COUNTS.put(Operation.PHP, modeMap); 
+		CYCLE_COUNTS.put(Operation.PHP, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 4);
-		CYCLE_COUNTS.put(Operation.PLA, modeMap); 
+		CYCLE_COUNTS.put(Operation.PLA, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 4);
-		CYCLE_COUNTS.put(Operation.PLP, modeMap); 
+		CYCLE_COUNTS.put(Operation.PLP, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.ACCUMULATOR, 2).set(AddressingMode.ZERO_PAGE, 5).set(AddressingMode.ZERO_PAGE_X_INDEXED, 6);
@@ -510,15 +512,15 @@ public class CpuTables {
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.ACCUMULATOR, 2).set(AddressingMode.ZERO_PAGE, 5).set(AddressingMode.ZERO_PAGE_X_INDEXED, 6);
 		modeMap.set(AddressingMode.ABSOLUTE, 6).set(AddressingMode.ABSOLUTE_X_INDEXED, 7);
-		CYCLE_COUNTS.put(Operation.ROR, modeMap); 
+		CYCLE_COUNTS.put(Operation.ROR, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 6);
-		CYCLE_COUNTS.put(Operation.RTI, modeMap); 
+		CYCLE_COUNTS.put(Operation.RTI, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 6);
-		CYCLE_COUNTS.put(Operation.RTS, modeMap); 
+		CYCLE_COUNTS.put(Operation.RTS, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 3).set(AddressingMode.ZERO_PAGE_X_INDEXED, 4);
@@ -528,21 +530,21 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
-		CYCLE_COUNTS.put(Operation.SEC, modeMap); 
+		CYCLE_COUNTS.put(Operation.SEC, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
-		CYCLE_COUNTS.put(Operation.SED, modeMap); 
+		CYCLE_COUNTS.put(Operation.SED, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
-		CYCLE_COUNTS.put(Operation.SEI, modeMap); 
+		CYCLE_COUNTS.put(Operation.SEI, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.ZERO_PAGE, 3).set(AddressingMode.ZERO_PAGE_X_INDEXED, 4).set(AddressingMode.ABSOLUTE, 4);
 		modeMap.set(AddressingMode.ABSOLUTE_X_INDEXED, 5).set(AddressingMode.ABSOLUTE_Y_INDEXED, 5).set(AddressingMode.PRE_INDEXED_INDIRECT, 6);
 		modeMap.set(AddressingMode.POST_INDEXED_INDIRECT, 6);
-		CYCLE_COUNTS.put(Operation.STA, modeMap); 
+		CYCLE_COUNTS.put(Operation.STA, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.ZERO_PAGE, 3).set(AddressingMode.ZERO_PAGE_Y_INDEXED, 4).set(AddressingMode.ABSOLUTE, 4);
@@ -554,36 +556,36 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
-		CYCLE_COUNTS.put(Operation.TAX, modeMap); 
+		CYCLE_COUNTS.put(Operation.TAX, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
-		CYCLE_COUNTS.put(Operation.TAY, modeMap); 
+		CYCLE_COUNTS.put(Operation.TAY, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
-		CYCLE_COUNTS.put(Operation.TSX, modeMap); 
+		CYCLE_COUNTS.put(Operation.TSX, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
-		CYCLE_COUNTS.put(Operation.TXA, modeMap); 
+		CYCLE_COUNTS.put(Operation.TXA, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
-		CYCLE_COUNTS.put(Operation.TXS, modeMap); 
+		CYCLE_COUNTS.put(Operation.TXS, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 2);
 		CYCLE_COUNTS.put(Operation.TYA, modeMap);
-		
+
 		/*
-		*  Build map of Operation/Addr. Mode -> Byte Count (for program counter)
-		*/
+		 * Build map of Operation/Addr. Mode -> Byte Count (for program counter)
+		 */
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 2).set(AddressingMode.ZERO_PAGE_X_INDEXED, 2);
 		modeMap.set(AddressingMode.ABSOLUTE, 3).set(AddressingMode.ABSOLUTE_X_INDEXED, 3).set(AddressingMode.ABSOLUTE_Y_INDEXED, 3);
 		modeMap.set(AddressingMode.PRE_INDEXED_INDIRECT, 2).set(AddressingMode.POST_INDEXED_INDIRECT, 2);
-		BYTE_COUNTS.put(Operation.ADC, modeMap);  
+		BYTE_COUNTS.put(Operation.ADC, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 2).set(AddressingMode.ZERO_PAGE_X_INDEXED, 2);
@@ -650,17 +652,17 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.CLV, modeMap);  
+		BYTE_COUNTS.put(Operation.CLV, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 2).set(AddressingMode.ZERO_PAGE_X_INDEXED, 2);
 		modeMap.set(AddressingMode.ABSOLUTE, 3).set(AddressingMode.ABSOLUTE_X_INDEXED, 3).set(AddressingMode.ABSOLUTE_Y_INDEXED, 3);
 		modeMap.set(AddressingMode.PRE_INDEXED_INDIRECT, 2).set(AddressingMode.POST_INDEXED_INDIRECT, 2);
-		BYTE_COUNTS.put(Operation.CMP, modeMap);  
+		BYTE_COUNTS.put(Operation.CMP, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 2).set(AddressingMode.ABSOLUTE, 3);
-		BYTE_COUNTS.put(Operation.CPX, modeMap);  
+		BYTE_COUNTS.put(Operation.CPX, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 2).set(AddressingMode.ABSOLUTE, 3);
@@ -677,7 +679,7 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.DEY, modeMap); 
+		BYTE_COUNTS.put(Operation.DEY, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 2).set(AddressingMode.ZERO_PAGE_X_INDEXED, 2);
@@ -696,7 +698,7 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.INY, modeMap); 
+		BYTE_COUNTS.put(Operation.INY, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.ABSOLUTE, 3).set(AddressingMode.INDIRECT, 3);
@@ -729,7 +731,7 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.NOP, modeMap); 
+		BYTE_COUNTS.put(Operation.NOP, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 2).set(AddressingMode.ZERO_PAGE_X_INDEXED, 2).set(AddressingMode.ABSOLUTE, 3).set(AddressingMode.ABSOLUTE_X_INDEXED, 3).set(AddressingMode.ABSOLUTE_Y_INDEXED, 3).set(AddressingMode.PRE_INDEXED_INDIRECT, 2).set(AddressingMode.POST_INDEXED_INDIRECT, 2);
@@ -737,19 +739,19 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.PHA, modeMap); 
+		BYTE_COUNTS.put(Operation.PHA, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.PHP, modeMap); 
+		BYTE_COUNTS.put(Operation.PHP, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.PLA, modeMap); 
+		BYTE_COUNTS.put(Operation.PLA, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.PLP, modeMap); 
+		BYTE_COUNTS.put(Operation.PLP, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.ACCUMULATOR, 1).set(AddressingMode.ZERO_PAGE, 2).set(AddressingMode.ZERO_PAGE_X_INDEXED, 2).set(AddressingMode.ABSOLUTE, 3).set(AddressingMode.ABSOLUTE_X_INDEXED, 3);
@@ -757,15 +759,15 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.ACCUMULATOR, 1).set(AddressingMode.ZERO_PAGE, 2).set(AddressingMode.ZERO_PAGE_X_INDEXED, 2).set(AddressingMode.ABSOLUTE, 3).set(AddressingMode.ABSOLUTE_X_INDEXED, 3);
-		BYTE_COUNTS.put(Operation.ROR, modeMap); 
+		BYTE_COUNTS.put(Operation.ROR, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.RTI, modeMap); 
+		BYTE_COUNTS.put(Operation.RTI, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.RTS, modeMap); 
+		BYTE_COUNTS.put(Operation.RTS, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMMEDIATE, 2).set(AddressingMode.ZERO_PAGE, 2).set(AddressingMode.ZERO_PAGE_X_INDEXED, 2).set(AddressingMode.ABSOLUTE, 3).set(AddressingMode.ABSOLUTE_X_INDEXED, 3).set(AddressingMode.ABSOLUTE_Y_INDEXED, 3).set(AddressingMode.PRE_INDEXED_INDIRECT, 2).set(AddressingMode.POST_INDEXED_INDIRECT, 2);
@@ -773,21 +775,21 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.SEC, modeMap); 
+		BYTE_COUNTS.put(Operation.SEC, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.SED, modeMap); 
+		BYTE_COUNTS.put(Operation.SED, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.SEI, modeMap); 
+		BYTE_COUNTS.put(Operation.SEI, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.ZERO_PAGE, 2).set(AddressingMode.ZERO_PAGE_X_INDEXED, 2).set(AddressingMode.ABSOLUTE, 3);
 		modeMap.set(AddressingMode.ABSOLUTE_X_INDEXED, 3).set(AddressingMode.ABSOLUTE_Y_INDEXED, 3).set(AddressingMode.PRE_INDEXED_INDIRECT, 2);
 		modeMap.set(AddressingMode.POST_INDEXED_INDIRECT, 2);
-		BYTE_COUNTS.put(Operation.STA, modeMap); 
+		BYTE_COUNTS.put(Operation.STA, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.ZERO_PAGE, 2).set(AddressingMode.ZERO_PAGE_Y_INDEXED, 2).set(AddressingMode.ABSOLUTE, 3);
@@ -799,31 +801,31 @@ public class CpuTables {
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.TAX, modeMap); 
+		BYTE_COUNTS.put(Operation.TAX, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.TAY, modeMap); 
+		BYTE_COUNTS.put(Operation.TAY, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.TSX, modeMap); 
+		BYTE_COUNTS.put(Operation.TSX, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.TXA, modeMap); 
+		BYTE_COUNTS.put(Operation.TXA, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.TXS, modeMap); 
+		BYTE_COUNTS.put(Operation.TXS, modeMap);
 
 		modeMap = new ChainedHashMap<AddressingMode, Integer>();
 		modeMap.set(AddressingMode.IMPLIED, 1);
-		BYTE_COUNTS.put(Operation.TYA, modeMap); 
+		BYTE_COUNTS.put(Operation.TYA, modeMap);
 	}
-	
-	class ChainedHashMap<K,V> extends HashMap<K,V> {
-		public ChainedHashMap<K,V> set(K key, V value) {
+
+	class ChainedHashMap<K, V> extends HashMap<K, V> {
+		public ChainedHashMap<K, V> set(K key, V value) {
 			this.put(key, value);
 			return this;
 		}

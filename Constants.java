@@ -1,12 +1,11 @@
 package com.tnes;
 
 public class Constants {
-	/* 
-	* *******
-	* ******* NES Constants **********
-	* *******
-	*/
-	public static int NMIB_LO  =  0xFFFA;
+	/*
+	 * 
+	 * NES Constants
+	 */
+	public static int NMIB_LO = 0xFFFA;
 	public static int NMIB_HI = 0xFFFB;
 	public static int RESET_LO = 0xFFFC;
 	public static int RESET_HI = 0xFFFD;
@@ -16,14 +15,13 @@ public class Constants {
 	public static int PRG_ROM_PAGE_SIZE = 0x4000;
 	public static int CHR_ROM_PAGE_SIZE = 0x2000;
 
-	/* 
-	* ******
-	* ******** CPU Constants ************
-	* *******
-	*/
+	/*
+	 * 
+	 * CPU Constants
+	 */
 	// CPU Memory map
-	public static int CPU_RAM_SIZE = 0x0800;  // 2kB
-	public static short CPU_RAM_PAGE_SIZE = 0xFF;  // 256 B
+	public static int CPU_RAM_SIZE = 0x0800; // 2kB
+	public static short CPU_RAM_PAGE_SIZE = 0xFF; // 256 B
 	public static int CARTRIDGE_RAM_SIZE = 0x1FFF;
 	public static int CARTRIDGE_BANK_SIZE = 0x4000;
 	public static short PPU_PORT_SIZE = 0x08;
@@ -39,7 +37,7 @@ public class Constants {
 	public static int IO_HI = 0x4FFF;
 	public static int PPU_PORT_LO = 0x2000;
 	public static int PPU_PORT_HI = 0x3FFF;
-	public static int OTHER_PORT_LO = 0x4000;  // Other Ports (APU mostly)
+	public static int OTHER_PORT_LO = 0x4000; // Other Ports (APU mostly)
 	public static int OTHER_PORT_HI = 0x4FFF;
 	public static int EXPANSION_MODULES_LO = 0x5000;
 	public static int EXPANSION_MODULES_HI = 0x5FFF;
@@ -66,8 +64,8 @@ public class Constants {
 	public static int JOYSTICK_2_PORT = 0x4017;
 
 	/*
-	*  Status Flags
-	*/
+	 * Status Flags
+	 */
 	public static short CPU_STAT_NEGATIVE = 0x80;
 	public static short CPU_STAT_OVERFLOW = 0x40;
 	public static short CPU_STAT_BREAK = 0x10;
@@ -76,12 +74,10 @@ public class Constants {
 	public static short CPU_STAT_ZERO = 0x02;
 	public static short CPU_STAT_CARRY = 0x01;
 
-
-	/* 
-	* ******
-	* ******** PPU Constants ************
-	* *******
-	*/
+	/*
+	 * 
+	 * PPU Constants
+	 */
 	public static int PPU_MEM_LO = 0x0000;
 	public static int PPU_MEM_HI = 0x3FFF;
 	public static int PPU_MEM_SIZE = 0x4000;
@@ -90,7 +86,7 @@ public class Constants {
 	public static int NAME_TABLE_SIZE = 0x03C0;
 	public static int ATTRIBUTE_TABLE_SIZE = 0x0040;
 	public static int PALETTE_SIZE = 0x0010;
-	public static int SPRITE_MEM_SIZE  =  0x100;
+	public static int SPRITE_MEM_SIZE = 0x100;
 
 	public static int PATTERN_TABLE_0_LO = 0x0000;
 	public static int PATTERN_TABLE_0_HI = 0x0FFF; // 4kB
@@ -120,14 +116,14 @@ public class Constants {
 	public static short SPRITE_MEM_HI = 0xFF;
 
 	/*
-	*  Status Flag
-	*/
+	 * Status Flag
+	 */
 	public static byte PPU_STAT_HIT = (byte) 0x40;
 	public static byte PPU_STAT_VBLANK = (byte) 0x80;
 
 	/*
-	*  Control Register Flags
-	*/
+	 * Control Register Flags
+	 */
 	public static short PPU_CTRL_1_NAME_TABLE_LO = 0x01;
 	public static short PPU_CTRL_1_NAME_TABLE_HI = 0x02;
 	public static short PPU_CTRL_1_NAME_TABLE_MASK = 0x03;
@@ -148,8 +144,8 @@ public class Constants {
 	public static int SCANLINE_CYCLES = 341;
 
 	/*
-	*  Joystick Constants
-	*/
+	 * Joystick Constants
+	 */
 	public static short JOYSTICK_A = 0x01;
 	public static short JOYSTICK_B = 0x02;
 	public static short JOYSTICK_SELECT = 0x04;

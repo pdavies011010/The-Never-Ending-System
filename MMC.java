@@ -219,15 +219,12 @@ public class MMC {
 			int trueAddress;
 			if (address <= Constants.PPU_PORT_HI) {
 				// PPU Ports
-				int portMirror = (address - Constants.PPU_PORT_LO)
-						/ Constants.PPU_PORT_SIZE;
+				int portMirror = (address - Constants.PPU_PORT_LO) / Constants.PPU_PORT_SIZE;
 				trueAddress = address - (Constants.PPU_PORT_SIZE * portMirror);
 			} else {
 				// Other Ports (APU mostly)
-				int portMirror = (address - Constants.OTHER_PORT_LO)
-						/ Constants.OTHER_PORT_SIZE;
-				trueAddress = address
-						- (Constants.OTHER_PORT_SIZE * portMirror);
+				int portMirror = (address - Constants.OTHER_PORT_LO) / Constants.OTHER_PORT_SIZE;
+				trueAddress = address - (Constants.OTHER_PORT_SIZE * portMirror);
 			}
 
 			if (trueAddress == Constants.PPU_CONTROL_REG_1_PORT)
@@ -257,23 +254,17 @@ public class MMC {
 				result = (byte) (0x40 | (joystick2LatchKeys & 0x01));
 				joystick2LatchKeys >>= 1;
 			}
-		} else if (address >= Constants.EXPANSION_MODULES_LO
-				&& address <= Constants.EXPANSION_MODULES_HI) {
+		} else if (address >= Constants.EXPANSION_MODULES_LO && address <= Constants.EXPANSION_MODULES_HI) {
 			// Read from expansion modules
-		} else if (address >= Constants.CARTRIDGE_RAM_LO
-				&& address <= Constants.CARTRIDGE_RAM_HI) {
+		} else if (address >= Constants.CARTRIDGE_RAM_LO && address <= Constants.CARTRIDGE_RAM_HI) {
 			// Read from cartridge ram
 			result = cartridgeRam[address - Constants.CARTRIDGE_RAM_LO];
-		} else if (address >= Constants.CARTRIDGE_ROM_LOW_BANK_LO
-				&& address <= Constants.CARTRIDGE_ROM_LOW_BANK_HI) {
+		} else if (address >= Constants.CARTRIDGE_ROM_LOW_BANK_LO && address <= Constants.CARTRIDGE_ROM_LOW_BANK_HI) {
 			// Read from cartridge low bank
-			result = cartridgeBankLo[address
-					- Constants.CARTRIDGE_ROM_LOW_BANK_LO];
-		} else if (address >= Constants.CARTRIDGE_ROM_HIGH_BANK_LO
-				&& address <= Constants.CARTRIDGE_ROM_HIGH_BANK_HI) {
+			result = cartridgeBankLo[address - Constants.CARTRIDGE_ROM_LOW_BANK_LO];
+		} else if (address >= Constants.CARTRIDGE_ROM_HIGH_BANK_LO && address <= Constants.CARTRIDGE_ROM_HIGH_BANK_HI) {
 			// Read from cartridge high bank
-			result = cartridgeBankHi[address
-					- Constants.CARTRIDGE_ROM_HIGH_BANK_LO];
+			result = cartridgeBankHi[address - Constants.CARTRIDGE_ROM_HIGH_BANK_LO];
 		}
 
 		return result;
@@ -288,15 +279,12 @@ public class MMC {
 			int trueAddress;
 			if (address <= Constants.PPU_PORT_HI) {
 				// PPU Ports
-				int portMirror = (address - Constants.PPU_PORT_LO)
-						/ Constants.PPU_PORT_SIZE;
+				int portMirror = (address - Constants.PPU_PORT_LO) / Constants.PPU_PORT_SIZE;
 				trueAddress = address - (Constants.PPU_PORT_SIZE * portMirror);
 			} else {
 				// Other Ports (APU mostly)
-				int portMirror = (address - Constants.OTHER_PORT_LO)
-						/ Constants.OTHER_PORT_SIZE;
-				trueAddress = address
-						- (Constants.OTHER_PORT_SIZE * portMirror);
+				int portMirror = (address - Constants.OTHER_PORT_LO) / Constants.OTHER_PORT_SIZE;
+				trueAddress = address - (Constants.OTHER_PORT_SIZE * portMirror);
 			}
 
 			if (trueAddress == Constants.PPU_CONTROL_REG_1_PORT)
@@ -324,99 +312,99 @@ public class MMC {
 		if (address >= Constants.CPU_RAM_LO && address <= Constants.CPU_RAM_HI) {
 			// Write into CPU RAM
 			// Handle mirroring
-		    int ramMirror = address / Constants.CPU_RAM_SIZE;
-		    int trueAddress = address - (Constants.CPU_RAM_SIZE * ramMirror);
-		    cpuRam[trueAddress] = value;
+			int ramMirror = address / Constants.CPU_RAM_SIZE;
+			int trueAddress = address - (Constants.CPU_RAM_SIZE * ramMirror);
+			cpuRam[trueAddress] = value;
 		} else if (address >= Constants.IO_LO && address <= Constants.IO_HI) {
-		    // Write into IO ports 
-		    // Handle port mirroring
+			// Write into IO ports
+			// Handle port mirroring
 			int trueAddress;
-		    if (address <= Constants.PPU_PORT_HI) {
-		    	// PPU Ports
-		      	int portMirror = (address - Constants.PPU_PORT_LO) / Constants.PPU_PORT_SIZE;
-		      	trueAddress = address - (Constants.PPU_PORT_SIZE * portMirror);
-		    } else {
-		    	// Other Ports (APU mostly)
-		      	int portMirror = (address - Constants.OTHER_PORT_LO) / Constants.OTHER_PORT_SIZE;
-		      	trueAddress = address - (Constants.OTHER_PORT_SIZE * portMirror);
+			if (address <= Constants.PPU_PORT_HI) {
+				// PPU Ports
+				int portMirror = (address - Constants.PPU_PORT_LO) / Constants.PPU_PORT_SIZE;
+				trueAddress = address - (Constants.PPU_PORT_SIZE * portMirror);
+			} else {
+				// Other Ports (APU mostly)
+				int portMirror = (address - Constants.OTHER_PORT_LO) / Constants.OTHER_PORT_SIZE;
+				trueAddress = address - (Constants.OTHER_PORT_SIZE * portMirror);
 			}
-		      
-		    if (trueAddress == Constants.PPU_CONTROL_REG_1_PORT)
-		    	ppu.setControlReg1(value);
-		    else if (trueAddress == Constants.PPU_CONTROL_REG_2_PORT) {
-		    	ppu.setControlReg2(value);
-		    	// Recalculate background color
-		        ppu.updateBackgroundColor();
-		    } else if (trueAddress == Constants.PPU_SPRITE_MEM_ADDRESS_PORT)
-		    	ppu.setSpriteMemAddr(value);
-		    else if (trueAddress == Constants.PPU_SPRITE_MEM_DATA_PORT) {
-		          spriteMem[ppu.getSpriteMemAddr()] = value;
-		          ppu.setSpriteMemAddr(ppu.getSpriteMemAddr() + 1);
-		    } else if (trueAddress == Constants.PPU_SCREEN_SCROLL_OFFSET_PORT) {
-		    	if (!screenScrollRegSwitch) {
-			    	// Set Vertical Scroll Register
-		    		if (value <= 239)
-		    			ppu.setVerticalScrollReg(value);
-			    }
-			    else {
-			    	// Set Horizontal Scroll Register
-			    	ppu.setHorizontalScrollReg(value);
-			    }
-			    // Toggle switch
-			    screenScrollRegSwitch = !screenScrollRegSwitch;
-			 } else if (trueAddress == Constants.PPU_MEM_ADDRESS_PORT) {
-			 	if (!ppuMemAddressRegSwitch) {
-			 		// Reset the PPU memory address register
-			    	ppu.setPPUMemAddr(0);
-	
-			        // Set high 6 bits of PPU Memory address register
-			        ppu.setPPUMemAddr(ppu.getPPUMemAddr() | ((value & 0x3F) << 8)); 
-			    } else {
-			    	// Set low 8 bits of PPU Memory address register
-			    	ppu.setPPUMemAddr(ppu.getPPUMemAddr() | value);
-			    }
-			          
-			    // Toggle switch
-			 	ppuMemAddressRegSwitch = (!ppuMemAddressRegSwitch);
-		     } else if (trueAddress == Constants.PPU_MEM_DATA_PORT) {
-			 	writePPUMem(ppu.getPPUMemAddr(), value);
-			    debugger.debugPrint(String.format("\nWriting %s to PPU address %s", Debugger.byteToHex(value), Debugger.intToHex(ppu.getPPUMemAddr())));
-			    if (ppu.isVerticalRWFlagSet())
-			    	ppu.setPPUMemAddr(ppu.getPPUMemAddr() + 32);
-			    else
-			    	ppu.setPPUMemAddr(ppu.getPPUMemAddr() + 1);
-		     } else if (trueAddress == Constants.PPU_SPRITE_DMA_PORT) {
-		    	 // Sprite RAM DMA - Transfer 256 bytes of data from CPU mem to Sprite RAM
-		    	 // from location at (0x100 * value)
-		    	 int startAddress = value * 0x100;
-		    	 int endAddress = startAddress + 0x100;
-		    	 for (int i = startAddress; i < endAddress; i++) {
-		    		 spriteMem[i - startAddress] = readCPUMem(i); 
-		    	 }
-		     } else if (trueAddress == Constants.JOYSTICK_1_PORT) {
-		    	 if (value == 1) {
-			     	joystickLatchStarted = true;
-		    	 }
-			     else if (value == 0 && joystickLatchStarted) {
-			    	 joystickLatchStarted = false;
-			    	 joystick1LatchKeys = joystick1Keys;
-			    	 joystick2LatchKeys = joystick2Keys;
-			    	 joystick1Keys = 0;
-			    	 joystick2Keys = 0;
-			     }
-		    }
-	   } else if (address >= Constants.EXPANSION_MODULES_LO && address <= Constants.EXPANSION_MODULES_HI) {
-				// Write into expansion modules
-	   } else if (address >= Constants.CARTRIDGE_RAM_LO && address <= Constants.CARTRIDGE_RAM_HI) {
-		   // Write into cartridge ram
-		   cartridgeRam[address - Constants.CARTRIDGE_RAM_LO] = value;
-	   } else if (address >= Constants.CARTRIDGE_ROM_LOW_BANK_LO && address <= Constants.CARTRIDGE_ROM_LOW_BANK_HI) {
-		   // Write into cartridge low bank???
-		   // @cartridge_bank_low[address - CARTRIDGE_ROM_LOW_BANK_LO] = value
-	   } else if (address >= Constants.CARTRIDGE_ROM_HIGH_BANK_LO && address <= Constants.CARTRIDGE_ROM_HIGH_BANK_HI) {
-		   //Write into cartridge high bank???
-		   // @cartridge_bank_high[address - CARTRIDGE_ROM_HIGH_BANK_LO] = value
-	   }
+
+			if (trueAddress == Constants.PPU_CONTROL_REG_1_PORT)
+				ppu.setControlReg1(value);
+			else if (trueAddress == Constants.PPU_CONTROL_REG_2_PORT) {
+				ppu.setControlReg2(value);
+				// Recalculate background color
+				ppu.updateBackgroundColor();
+			} else if (trueAddress == Constants.PPU_SPRITE_MEM_ADDRESS_PORT)
+				ppu.setSpriteMemAddr(value);
+			else if (trueAddress == Constants.PPU_SPRITE_MEM_DATA_PORT) {
+				spriteMem[ppu.getSpriteMemAddr()] = value;
+				ppu.setSpriteMemAddr(ppu.getSpriteMemAddr() + 1);
+			} else if (trueAddress == Constants.PPU_SCREEN_SCROLL_OFFSET_PORT) {
+				if (!screenScrollRegSwitch) {
+					// Set Vertical Scroll Register
+					if (value <= 239)
+						ppu.setVerticalScrollReg(value);
+				} else {
+					// Set Horizontal Scroll Register
+					ppu.setHorizontalScrollReg(value);
+				}
+				// Toggle switch
+				screenScrollRegSwitch = !screenScrollRegSwitch;
+			} else if (trueAddress == Constants.PPU_MEM_ADDRESS_PORT) {
+				if (!ppuMemAddressRegSwitch) {
+					// Reset the PPU memory address register
+					ppu.setPPUMemAddr(0);
+
+					// Set high 6 bits of PPU Memory address register
+					ppu.setPPUMemAddr(ppu.getPPUMemAddr() | ((value & 0x3F) << 8));
+				} else {
+					// Set low 8 bits of PPU Memory address register
+					ppu.setPPUMemAddr(ppu.getPPUMemAddr() | value);
+				}
+
+				// Toggle switch
+				ppuMemAddressRegSwitch = (!ppuMemAddressRegSwitch);
+			} else if (trueAddress == Constants.PPU_MEM_DATA_PORT) {
+				writePPUMem(ppu.getPPUMemAddr(), value);
+				debugger.debugPrint(String.format("\nWriting %s to PPU address %s", Debugger.byteToHex(value), Debugger.intToHex(ppu.getPPUMemAddr())));
+				if (ppu.isVerticalRWFlagSet())
+					ppu.setPPUMemAddr(ppu.getPPUMemAddr() + 32);
+				else
+					ppu.setPPUMemAddr(ppu.getPPUMemAddr() + 1);
+			} else if (trueAddress == Constants.PPU_SPRITE_DMA_PORT) {
+				// Sprite RAM DMA - Transfer 256 bytes of data from CPU mem to
+				// Sprite RAM
+				// from location at (0x100 * value)
+				int startAddress = value * 0x100;
+				int endAddress = startAddress + 0x100;
+				for (int i = startAddress; i < endAddress; i++) {
+					spriteMem[i - startAddress] = readCPUMem(i);
+				}
+			} else if (trueAddress == Constants.JOYSTICK_1_PORT) {
+				if (value == 1) {
+					joystickLatchStarted = true;
+				} else if (value == 0 && joystickLatchStarted) {
+					joystickLatchStarted = false;
+					joystick1LatchKeys = joystick1Keys;
+					joystick2LatchKeys = joystick2Keys;
+					joystick1Keys = 0;
+					joystick2Keys = 0;
+				}
+			}
+		} else if (address >= Constants.EXPANSION_MODULES_LO && address <= Constants.EXPANSION_MODULES_HI) {
+			// Write into expansion modules
+		} else if (address >= Constants.CARTRIDGE_RAM_LO && address <= Constants.CARTRIDGE_RAM_HI) {
+			// Write into cartridge ram
+			cartridgeRam[address - Constants.CARTRIDGE_RAM_LO] = value;
+		} else if (address >= Constants.CARTRIDGE_ROM_LOW_BANK_LO && address <= Constants.CARTRIDGE_ROM_LOW_BANK_HI) {
+			// Write into cartridge low bank???
+			// @cartridge_bank_low[address - CARTRIDGE_ROM_LOW_BANK_LO] = value
+		} else if (address >= Constants.CARTRIDGE_ROM_HIGH_BANK_LO && address <= Constants.CARTRIDGE_ROM_HIGH_BANK_HI) {
+			// Write into cartridge high bank???
+			// @cartridge_bank_high[address - CARTRIDGE_ROM_HIGH_BANK_LO] =
+			// value
+		}
 	}
 
 	public byte readPPUMem(int address) {
@@ -425,58 +413,58 @@ public class MMC {
 		if (address >= Constants.PATTERN_TABLE_0_LO && address <= Constants.PATTERN_TABLE_0_HI)
 			result = patternTable0[address];
 		else if (address >= Constants.PATTERN_TABLE_1_LO && address <= Constants.PATTERN_TABLE_1_HI)
-		    result = patternTable1[address - Constants.PATTERN_TABLE_1_LO];
+			result = patternTable1[address - Constants.PATTERN_TABLE_1_LO];
 		else if (address >= Constants.NAME_TABLE_0_LO && address <= Constants.NAME_TABLE_0_HI)
-		    result = nameTable0[address - Constants.NAME_TABLE_0_LO];
+			result = nameTable0[address - Constants.NAME_TABLE_0_LO];
 		else if (address >= Constants.ATTRIBUTE_TABLE_0_LO && address <= Constants.ATTRIBUTE_TABLE_0_HI)
-		    result = attributeTable0[address - Constants.ATTRIBUTE_TABLE_0_LO];
+			result = attributeTable0[address - Constants.ATTRIBUTE_TABLE_0_LO];
 		else if (address >= Constants.NAME_TABLE_1_LO && address <= Constants.NAME_TABLE_1_HI)
-		    result = nameTable1[address - Constants.NAME_TABLE_1_LO];
+			result = nameTable1[address - Constants.NAME_TABLE_1_LO];
 		else if (address >= Constants.ATTRIBUTE_TABLE_1_LO && address <= Constants.ATTRIBUTE_TABLE_1_HI)
-		    result = attributeTable1[address - Constants.ATTRIBUTE_TABLE_1_LO];
+			result = attributeTable1[address - Constants.ATTRIBUTE_TABLE_1_LO];
 		else if (address >= Constants.NAME_TABLE_2_LO && address <= Constants.NAME_TABLE_2_HI)
-		    result = nameTable2[address - Constants.NAME_TABLE_2_LO];
+			result = nameTable2[address - Constants.NAME_TABLE_2_LO];
 		else if (address >= Constants.ATTRIBUTE_TABLE_2_LO && address <= Constants.ATTRIBUTE_TABLE_2_HI)
-		    result = attributeTable2[address - Constants.ATTRIBUTE_TABLE_2_LO];
+			result = attributeTable2[address - Constants.ATTRIBUTE_TABLE_2_LO];
 		else if (address >= Constants.NAME_TABLE_3_LO && address <= Constants.NAME_TABLE_3_HI)
-		    result = nameTable3[address - Constants.NAME_TABLE_3_LO];
+			result = nameTable3[address - Constants.NAME_TABLE_3_LO];
 		else if (address >= Constants.ATTRIBUTE_TABLE_3_LO && address <= Constants.ATTRIBUTE_TABLE_3_HI)
-		    result = attributeTable3[address - Constants.ATTRIBUTE_TABLE_3_LO];
+			result = attributeTable3[address - Constants.ATTRIBUTE_TABLE_3_LO];
 		else if (address >= Constants.IMAGE_PALETTE_LO && address <= Constants.IMAGE_PALETTE_HI)
-		    result = imagePalette[address - Constants.IMAGE_PALETTE_LO];
+			result = imagePalette[address - Constants.IMAGE_PALETTE_LO];
 		else if (address >= Constants.SPRITE_PALETTE_LO && address <= Constants.SPRITE_PALETTE_HI)
-		    result = spritePalette[address - Constants.SPRITE_PALETTE_LO];
-		
+			result = spritePalette[address - Constants.SPRITE_PALETTE_LO];
+
 		return result;
 	}
 
 	public void writePPUMem(int address, byte value) {
 		if (address >= Constants.PATTERN_TABLE_0_LO && address <= Constants.PATTERN_TABLE_0_HI && isPatternTable0Writable())
-			patternTable0[address] = value; 
+			patternTable0[address] = value;
 		else if (address >= Constants.PATTERN_TABLE_1_LO && address <= Constants.PATTERN_TABLE_1_HI && isPatternTable1Writable())
-		    patternTable1[address - Constants.PATTERN_TABLE_1_LO] = value;
+			patternTable1[address - Constants.PATTERN_TABLE_1_LO] = value;
 		else if (address >= Constants.NAME_TABLE_0_LO && address <= Constants.NAME_TABLE_0_HI)
-		    nameTable0[address - Constants.NAME_TABLE_0_LO] = value;
+			nameTable0[address - Constants.NAME_TABLE_0_LO] = value;
 		else if (address >= Constants.ATTRIBUTE_TABLE_0_LO && address <= Constants.ATTRIBUTE_TABLE_0_HI)
-		    attributeTable0[address - Constants.ATTRIBUTE_TABLE_0_LO] = value;
+			attributeTable0[address - Constants.ATTRIBUTE_TABLE_0_LO] = value;
 		else if (address >= Constants.NAME_TABLE_1_LO && address <= Constants.NAME_TABLE_1_HI)
-		    nameTable1[address - Constants.NAME_TABLE_1_LO] = value;
+			nameTable1[address - Constants.NAME_TABLE_1_LO] = value;
 		else if (address >= Constants.ATTRIBUTE_TABLE_1_LO && address <= Constants.ATTRIBUTE_TABLE_1_HI)
-		    attributeTable1[address - Constants.ATTRIBUTE_TABLE_1_LO] = value;
+			attributeTable1[address - Constants.ATTRIBUTE_TABLE_1_LO] = value;
 		else if (address >= Constants.NAME_TABLE_2_LO && address <= Constants.NAME_TABLE_2_HI)
-		    nameTable2[address - Constants.NAME_TABLE_2_LO] = value;
+			nameTable2[address - Constants.NAME_TABLE_2_LO] = value;
 		else if (address >= Constants.ATTRIBUTE_TABLE_2_LO && address <= Constants.ATTRIBUTE_TABLE_2_HI)
-		    attributeTable2[address - Constants.ATTRIBUTE_TABLE_2_LO] = value;
+			attributeTable2[address - Constants.ATTRIBUTE_TABLE_2_LO] = value;
 		else if (address >= Constants.NAME_TABLE_3_LO && address <= Constants.NAME_TABLE_3_HI)
-		    nameTable3[address - Constants.NAME_TABLE_3_LO] = value;
+			nameTable3[address - Constants.NAME_TABLE_3_LO] = value;
 		else if (address >= Constants.ATTRIBUTE_TABLE_3_LO && address <= Constants.ATTRIBUTE_TABLE_3_HI)
-		    attributeTable3[address - Constants.ATTRIBUTE_TABLE_3_LO] = value;
+			attributeTable3[address - Constants.ATTRIBUTE_TABLE_3_LO] = value;
 		else if (address >= Constants.IMAGE_PALETTE_LO && address <= Constants.IMAGE_PALETTE_HI)
-		    imagePalette[address - Constants.IMAGE_PALETTE_LO] = value;
+			imagePalette[address - Constants.IMAGE_PALETTE_LO] = value;
 		else if (address >= Constants.SPRITE_PALETTE_LO && address <= Constants.SPRITE_PALETTE_HI)
-		    spritePalette[address - Constants.SPRITE_PALETTE_LO] = value;
+			spritePalette[address - Constants.SPRITE_PALETTE_LO] = value;
 	}
-	
+
 	private void addDebugCommands() {
 		try {
 			debugger.addCommand("getCPUMem", MMC.class.getMethod("__getCPUMem", String.class), this);
@@ -488,83 +476,83 @@ public class MMC {
 			debugger.addCommand("getSpriteMem", MMC.class.getMethod("__getSpriteMem", String.class), this);
 			debugger.addCommand("setSpriteMem", MMC.class.getMethod("__setSpriteMem", String.class), this);
 			debugger.addCommand("getSpriteMemBlock", MMC.class.getMethod("__getSpriteMemBlock", String.class), this);
-			
+
 		} catch (NoSuchMethodException e) {
 			System.out.println(e.getMessage());
 		}
 	}
-	
+
 	/*
-	 *  Debugger methods
+	 * Debugger methods
 	 */
 	public void __getCPUMem(String param) {
 		int address = Integer.parseInt(param);
 		debugger.debugPrint(Debugger.byteToHex(readCPUMemSafe(address)) + "\n");
 	}
-	
+
 	public void __setCPUMem(String param) {
 		int address = Debugger.hexToInt(param.split(",")[0]);
 		byte value = Debugger.hexToByte(param.split(",")[1]);
 		writeCPUMem(address, value);
 	}
-	
+
 	public void __getCPUMemBlock(String param) {
 		int address0 = Debugger.hexToInt(param.split(",")[0]);
 		int address1 = Debugger.hexToInt(param.split(",")[1]);
-		
+
 		debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(address0)));
 		for (int i = address0; i <= address1; i++) {
 			if (i % 16 == 0 && i != address0)
 				debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(i)));
-			
+
 			debugger.debugPrint(String.format(" %s", Debugger.byteToHex(readCPUMemSafe(i))));
 		}
 	}
-	
+
 	public void __getPPUMem(String param) {
 		int address = Integer.parseInt(param);
 		debugger.debugPrint(Debugger.byteToHex(readPPUMem(address)) + "\n");
 	}
-	
+
 	public void __setPPUMem(String param) {
 		int address = Debugger.hexToInt(param.split(",")[0]);
 		byte value = Debugger.hexToByte(param.split(",")[1]);
 		writePPUMem(address, value);
 	}
-	
+
 	public void __getPPUMemBlock(String param) {
 		int address0 = Debugger.hexToInt(param.split(",")[0]);
 		int address1 = Debugger.hexToInt(param.split(",")[1]);
-		
+
 		debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(address0)));
 		for (int i = address0; i <= address1; i++) {
 			if (i % 16 == 0 && i != address0)
 				debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(i)));
-			
+
 			debugger.debugPrint(String.format(" %s", Debugger.byteToHex(readPPUMem(i))));
 		}
 	}
-	
+
 	public void __getSpriteMem(String param) {
 		int address = Integer.parseInt(param);
 		debugger.debugPrint(Debugger.byteToHex(spriteMem[address]) + "\n");
 	}
-	
+
 	public void __setSpriteMem(String param) {
 		int address = Debugger.hexToInt(param.split(",")[0]);
 		byte value = Debugger.hexToByte(param.split(",")[1]);
 		spriteMem[address] = value;
 	}
-	
+
 	public void __getSpriteMemBlock(String param) {
 		int address0 = Debugger.hexToInt(param.split(",")[0]);
 		int address1 = Debugger.hexToInt(param.split(",")[1]);
-		
+
 		debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(address0)));
 		for (int i = address0; i <= address1; i++) {
 			if (i % 16 == 0 && i != address0)
 				debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(i)));
-			
+
 			debugger.debugPrint(String.format(" %s", Debugger.byteToHex(spriteMem[i])));
 		}
 	}
