@@ -13,14 +13,19 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
 
+/*
+ * Singleton class, use 'getInstance(boolean, logFileName)'
+ */
 public class Debugger {
 	private boolean debugging = false;
 	private File logFile;
 	private Map<String, DebuggerCommand> commands = new HashMap<String, DebuggerCommand>();
+	private static Debugger debugger;
 	
+	public static String LOG_FILE_NAME = "tnes.log";
 	public static String PARAM_DELIM = ",";
 	
-	public Debugger(boolean debugging, String logFileName) throws IOException {
+	private Debugger(boolean debugging, String logFileName) throws IOException {
 		this.debugging = debugging;
 		this.commands = new HashMap<String, DebuggerCommand>();
 		this.logFile = new File(logFileName);
@@ -29,6 +34,19 @@ public class Debugger {
 			this.logFile.renameTo(new File(logFileName + formatter.format(new Date())));
 		}
 		this.logFile.createNewFile();
+	}
+	
+	public static Debugger getInstance() {
+		if (debugger == null) {
+			try {
+				debugger = new Debugger(false, Debugger.LOG_FILE_NAME);
+			} catch (IOException e) {
+				System.out.println(e.getMessage());
+				debugger = null;
+			}
+		}
+		
+		return debugger;
 	}
 	
 	public boolean isDebugging() {
@@ -75,6 +93,14 @@ public class Debugger {
 		Object contextObject = command.getContextObject();
 		Method method = command.getMethod();
 		method.invoke(contextObject, param);
+	}
+	
+	public static String intToHex(int value) {
+		return String.format("%x", value);
+	}
+	
+	public static String byteToHex(byte value) {
+		return String.format("%x", value);
 	}
 	
 	/* Debugger command object. 
