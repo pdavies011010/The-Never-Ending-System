@@ -4,6 +4,7 @@ import com.tnes.Constants;
 import com.tnes.CPU;
 import com.tnes.PPU;
 import com.tnes.Debugger;
+import java.lang.reflect.Method;
 
 public class MMC {
 	private CPU cpu;
@@ -474,5 +475,97 @@ public class MMC {
 		    imagePalette[address - Constants.IMAGE_PALETTE_LO] = value;
 		else if (address >= Constants.SPRITE_PALETTE_LO && address <= Constants.SPRITE_PALETTE_HI)
 		    spritePalette[address - Constants.SPRITE_PALETTE_LO] = value;
+	}
+	
+	private void addDebugCommands() {
+		try {
+			debugger.addCommand("getCPUMem", MMC.class.getMethod("__getCPUMem", String.class), this);
+			debugger.addCommand("setCPUMem", MMC.class.getMethod("__setCPUMem", String.class), this);
+			debugger.addCommand("getCPUMemBlock", MMC.class.getMethod("__getCPUMemBlock", String.class), this);
+			debugger.addCommand("getPPUMem", MMC.class.getMethod("__getPPUMem", String.class), this);
+			debugger.addCommand("setPPUMem", MMC.class.getMethod("__setPPUMem", String.class), this);
+			debugger.addCommand("getPPUMemBlock", MMC.class.getMethod("__getPPUMemBlock", String.class), this);
+			debugger.addCommand("getSpriteMem", MMC.class.getMethod("__getSpriteMem", String.class), this);
+			debugger.addCommand("setSpriteMem", MMC.class.getMethod("__setSpriteMem", String.class), this);
+			debugger.addCommand("getSpriteMemBlock", MMC.class.getMethod("__getSpriteMemBlock", String.class), this);
+			
+		} catch (NoSuchMethodException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	/*
+	 *  Debugger methods
+	 */
+	public void __getCPUMem(String param) {
+		int address = Integer.parseInt(param);
+		debugger.debugPrint(Debugger.byteToHex(readCPUMemSafe(address)) + "\n");
+	}
+	
+	public void __setCPUMem(String param) {
+		int address = Debugger.hexToInt(param.split(",")[0]);
+		byte value = Debugger.hexToByte(param.split(",")[1]);
+		writeCPUMem(address, value);
+	}
+	
+	public void __getCPUMemBlock(String param) {
+		int address0 = Debugger.hexToInt(param.split(",")[0]);
+		int address1 = Debugger.hexToInt(param.split(",")[1]);
+		
+		debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(address0)));
+		for (int i = address0; i <= address1; i++) {
+			if (i % 16 == 0 && i != address0)
+				debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(i)));
+			
+			debugger.debugPrint(String.format(" %s", Debugger.byteToHex(readCPUMemSafe(i))));
+		}
+	}
+	
+	public void __getPPUMem(String param) {
+		int address = Integer.parseInt(param);
+		debugger.debugPrint(Debugger.byteToHex(readPPUMem(address)) + "\n");
+	}
+	
+	public void __setPPUMem(String param) {
+		int address = Debugger.hexToInt(param.split(",")[0]);
+		byte value = Debugger.hexToByte(param.split(",")[1]);
+		writePPUMem(address, value);
+	}
+	
+	public void __getPPUMemBlock(String param) {
+		int address0 = Debugger.hexToInt(param.split(",")[0]);
+		int address1 = Debugger.hexToInt(param.split(",")[1]);
+		
+		debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(address0)));
+		for (int i = address0; i <= address1; i++) {
+			if (i % 16 == 0 && i != address0)
+				debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(i)));
+			
+			debugger.debugPrint(String.format(" %s", Debugger.byteToHex(readPPUMem(i))));
+		}
+	}
+	
+	public void __getSpriteMem(String param) {
+		int address = Integer.parseInt(param);
+		debugger.debugPrint(Debugger.byteToHex(spriteMem[address]) + "\n");
+	}
+	
+	public void __setSpriteMem(String param) {
+		int address = Debugger.hexToInt(param.split(",")[0]);
+		byte value = Debugger.hexToByte(param.split(",")[1]);
+		spriteMem[address] = value;
+	}
+	
+	public void __getSpriteMemBlock(String param) {
+		int address0 = Debugger.hexToInt(param.split(",")[0]);
+		int address1 = Debugger.hexToInt(param.split(",")[1]);
+		
+		debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(address0)));
+		for (int i = address0; i <= address1; i++) {
+			if (i % 16 == 0 && i != address0)
+				debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(i)));
+			
+			debugger.debugPrint(String.format(" %s", Debugger.byteToHex(spriteMem[i])));
+		}
 	}
 }

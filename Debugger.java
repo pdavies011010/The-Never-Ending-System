@@ -81,20 +81,28 @@ public class Debugger {
 	/*
 	 * Add a command to the list of available commands. 
 	 */
-	public void addCommand(String name, DebuggerCommand command) {
-		commands.put(name, command);
+	public void addCommand(String name, Method method, Object contextObject) {
+		commands.put(name, new DebuggerCommand(method, contextObject));
 	}
 	
 	/*
 	 * Execute a named command.
 	 */
-	public void execCommand(String name, String param) throws Exception {
+	public void execCommand(String name, String param) {
 		DebuggerCommand command = commands.get(name);
 		Object contextObject = command.getContextObject();
 		Method method = command.getMethod();
-		method.invoke(contextObject, param);
+		
+		try {
+			method.invoke(contextObject, param);
+		} catch (Exception e) {
+			debugPrint(e.getMessage());
+		}
 	}
 	
+	/*
+	 * Static utility methods
+	 */
 	public static String intToHex(int value) {
 		return String.format("%x", value);
 	}
@@ -103,10 +111,17 @@ public class Debugger {
 		return String.format("%x", value);
 	}
 	
+	public static int hexToInt(String value) {
+		return Integer.parseInt(value, 16);
+	}
+	
+	public static byte hexToByte(String value) {
+		return Byte.parseByte(value, 16);
+	}
+	
 	/* Debugger command object. 
-	 * Methods should receive two parameters...
-	 * 	1) <context> an Object that it will take it's context info from
-	 *  2) <param> a String, which may be delimited by Debugger.PARAM_DELIM
+	 * Methods should receive one parameter...
+	 *  1) <param> a String, which may be delimited by Debugger.PARAM_DELIM
 	 */
 	public class DebuggerCommand {
 		private Method method;
