@@ -141,4 +141,28 @@ public class CPU {
 	public void __clearBreakpoints(String param) {
 		this.breakpoints.clear();
 	}
+	
+	public void __getStackPointer(String param) {
+		debugger.debugPrint(String.format("\n%s", Debugger.byteToHex(sp)));
+	}
+	
+	public void __getProgramCounter(String param) {
+		debugger.debugPrint(String.format("\n%s", Debugger.intToHex(pc)));
+	}
+	
+	public void __getProcessorStatus(String param) {
+		debugger.debugPrint(String.format("\n%s", Debugger.byteToHex(flags)));
+	}
+	
+	public void __getAccumulator(String param) {
+		debugger.debugPrint(String.format("\n%s", Debugger.byteToHex(a)));
+	}
+	
+	public void __getX(String param) {
+		debugger.debugPrint(String.format("\n%s", Debugger.byteToHex(x)));
+	}
+	
+	public void __getY(String param) {
+		debugger.debugPrint(String.format("\n%s", Debugger.byteToHex(y)));
+	}
 }

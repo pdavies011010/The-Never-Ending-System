@@ -1,6 +1,7 @@
 package com.tnes;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CpuTables {
 	// Operation Hash (OPERATIONS[opcode] -> operation)
@@ -825,6 +826,8 @@ public class CpuTables {
 	}
 
 	class ChainedHashMap<K, V> extends HashMap<K, V> {
+		private static final long serialVersionUID = 1L;
+
 		public ChainedHashMap<K, V> set(K key, V value) {
 			this.put(key, value);
 			return this;
