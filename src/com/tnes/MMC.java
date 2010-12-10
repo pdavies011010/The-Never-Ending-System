@@ -46,6 +46,9 @@ public class MMC {
 		joystick2Keys = 0;
 		joystick1LatchKeys = 0;
 		joystick2LatchKeys = 0;
+		
+		// Add MMC commands to the debugger
+		addDebugCommands();
 	}
 
 	public CPU getCPU() {

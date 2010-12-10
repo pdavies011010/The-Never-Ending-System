@@ -1,5 +1,3 @@
-package com.tnes;
-
 import java.lang.reflect.Method;
 import java.io.File;
 import java.text.SimpleDateFormat;
