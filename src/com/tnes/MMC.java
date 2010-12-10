@@ -45,6 +45,9 @@ public class MMC {
 		addDebugCommands();
 	}
 
+	/*
+	 * Getters and Setters
+	 */
 	public CPU getCPU() {
 		return cpu;
 	}
@@ -201,6 +204,10 @@ public class MMC {
 		this.joystick2LatchKeys = joystick2LatchKeys;
 	}
 
+	
+	/*
+	 *   MMC Logic
+	 */
 	public byte readCPUMem(int address) {
 		byte result = 0;
 

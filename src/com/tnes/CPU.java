@@ -47,6 +47,9 @@ public class CPU {
 		addDebugCommands();
 	}
 
+	/*
+	 * Getters and Setters
+	 */
 	public MMC getMMC() {
 		return mmc;
 	}
@@ -187,6 +190,18 @@ public class CPU {
 			flags &= ~Constants.CPU_STAT_CARRY;
 	}
 
+	/*
+	 * CPU Logic
+	 */
+	public void reset() {
+		// Reset - load PC with with appropriate location from reset vector
+		pc = (mmc.readCPUMem(Constants.RESET_HI) << 8) | mmc.readCPUMem(Constants.RESET_LO);
+
+		debugger.debugPrint("\nReset.");
+		if (logCPUState)
+			debugger.debugLog("\nReset.");
+	}
+
 	private void addDebugCommands() {
 		try {
 			debugger.addCommand("go", CPU.class.getMethod("__go", String.class), this);
@@ -304,9 +319,9 @@ public class CPU {
 
 		debugger.debugPrint(String.format("\nOperation: %s  Addressing Mode: %s  Address: %s  Data: %s", operation.toString(), addressingMode.toString(), address, data));
 		debugger.debugPrint(String.format("\nPC: %s  SP: %s  A: %s  X: %s  Y: %s", Debugger.intToHex(pc), Debugger.byteToHex(sp), Debugger.byteToHex(a), Debugger.byteToHex(x), Debugger.byteToHex(y)));
-		debugger.debugPrint(String.format("\nStatus: S-%d  V-%d  B-%d  D-%d  I-%d  Z-%d  C-%d", isSignFlagSet()?1:0, isOverflowFlagSet()?1:0, isBreakFlagSet()?1:0, isDecimalFlagSet()?1:0, isInterruptFlagSet()?1:0, isZeroFlagSet()?1:0, isCarryFlagSet()?1:0));
+		debugger.debugPrint(String.format("\nStatus: S-%d  V-%d  B-%d  D-%d  I-%d  Z-%d  C-%d", isSignFlagSet() ? 1 : 0, isOverflowFlagSet() ? 1 : 0, isBreakFlagSet() ? 1 : 0, isDecimalFlagSet() ? 1 : 0, isInterruptFlagSet() ? 1 : 0, isZeroFlagSet() ? 1 : 0, isCarryFlagSet() ? 1 : 0));
 	}
-	
+
 	public void __logCPUState(String param) {
 		byte opcode = mmc.readCPUMemSafe(pc);
 		Operation operation = cpuTables.OPERATIONS.get(opcode);
@@ -322,20 +337,15 @@ public class CPU {
 		int address = Integer.parseInt(param.split(",")[0]);
 		byte data = Byte.parseByte(param.split(",")[1]);
 
-		try {
-			debugger.debugLog(String.format("\nOperation: %s  Addressing Mode: %s  Address: %s  Data: %s", operation.toString(), addressingMode.toString(), address, data));
-			debugger.debugLog(String.format("\nPC: %s  SP: %s  A: %s  X: %s  Y: %s", Debugger.intToHex(pc), Debugger.byteToHex(sp), Debugger.byteToHex(a), Debugger.byteToHex(x), Debugger.byteToHex(y)));
-			debugger.debugLog(String.format("\nStatus: S-%d  V-%d  B-%d  D-%d  I-%d  Z-%d  C-%d", isSignFlagSet()?1:0, isOverflowFlagSet()?1:0, isBreakFlagSet()?1:0, isDecimalFlagSet()?1:0, isInterruptFlagSet()?1:0, isZeroFlagSet()?1:0, isCarryFlagSet()?1:0));
-	
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
+		debugger.debugLog(String.format("\nOperation: %s  Addressing Mode: %s  Address: %s  Data: %s", operation.toString(), addressingMode.toString(), address, data));
+		debugger.debugLog(String.format("\nPC: %s  SP: %s  A: %s  X: %s  Y: %s", Debugger.intToHex(pc), Debugger.byteToHex(sp), Debugger.byteToHex(a), Debugger.byteToHex(x), Debugger.byteToHex(y)));
+		debugger.debugLog(String.format("\nStatus: S-%d  V-%d  B-%d  D-%d  I-%d  Z-%d  C-%d", isSignFlagSet() ? 1 : 0, isOverflowFlagSet() ? 1 : 0, isBreakFlagSet() ? 1 : 0, isDecimalFlagSet() ? 1 : 0, isInterruptFlagSet() ? 1 : 0, isZeroFlagSet() ? 1 : 0, isCarryFlagSet() ? 1 : 0));
 	}
-	
+
 	public void __enableCPULogging(String param) {
 		logCPUState = true;
 	}
-	
+
 	public void __disableCPULogging(String param) {
 		logCPUState = false;
 	}
