@@ -1,1 +1,1 @@
-javac -d classes\ *.java
+javac -d classes\ src\com\tnes\*.java

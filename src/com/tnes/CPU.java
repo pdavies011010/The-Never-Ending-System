@@ -1,17 +1,12 @@
 package com.tnes;
 
-import com.tnes.Constants;
-import com.tnes.MMC;
-import com.tnes.CpuTables;
-import com.tnes.Opcode;
-import com.tnes.Operation;
-import com.tnes.Debugger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CPU {
 	private MMC mmc;
 	private Debugger debugger = Debugger.getInstance();
-	
+
 	private byte sp;
 	private int pc;
 	private byte flags;
@@ -136,13 +131,13 @@ public class CPU {
 	}
 
 	public void __setBreakpoint(String param) {
-		this.breakpoints.add(new Integer(Debugger.hextToInt(param)));
+		this.breakpoints.add(new Integer(Debugger.hexToInt(param)));
 	}
-	
+
 	public void __clearBreakpoint(String param) {
-		this.breakpoints.remove(new Integer(Debugger.hextToInt(param)));
+		this.breakpoints.remove(new Integer(Debugger.hexToInt(param)));
 	}
-	
+
 	public void __clearBreakpoints(String param) {
 		this.breakpoints.clear();
 	}

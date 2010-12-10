@@ -1,15 +1,17 @@
-import java.lang.reflect.Method;
+package com.tnes;
+
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.io.OutputStream;
-import java.io.FileOutputStream;
-import java.io.Writer;
-import java.io.OutputStreamWriter;
-import java.util.Map;
-import java.util.HashMap;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
  * Singleton class, use 'getInstance(boolean, logFileName)'

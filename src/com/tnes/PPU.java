@@ -1,8 +1,5 @@
 package com.tnes;
 
-import com.tnes.Constants;
-import com.tnes.MMC;
-
 public class PPU {
 	private MMC mmc;
 	private byte nameTableMirroring;
@@ -12,6 +9,7 @@ public class PPU {
 	private byte[][] screenBuffer = new byte[241][256];
 	private byte scanline;
 	private int elapsedCycles;
+	private byte backgroundColor;
 	private boolean frameComplete;
 
 	public PPU(MMC mmc) {
@@ -125,7 +123,7 @@ public class PPU {
 		byte color = getBackgroundColorBits();
 
 		// Default to Black
-		byte backgroundColor = 0x0F;
+		backgroundColor = 0x0F;
 		switch (color) {
 		case 0:
 			// Palette Black
