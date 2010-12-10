@@ -3,11 +3,27 @@ package com.tnes;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ * Singleton class, use 'getInstance()'
+ */
 public class CpuTables {
+	private static CpuTables cpuTables;
+	
+	private CpuTables() {
+	}
+	
+	public static CpuTables getInstance() {
+		if (cpuTables == null) {
+			cpuTables = new CpuTables();
+		}
+		
+		return cpuTables;
+	}
+	
 	// Operation Hash (OPERATIONS[opcode] -> operation)
-	public Map<Short, Operation> OPERATIONS = new HashMap<Short, Operation>();
+	public Map<Byte, Operation> OPERATIONS = new HashMap<Byte, Operation>();
 	// Addressing Mode hash (ADDRESSING_MODES[opcode] -> addressing_mode)
-	public Map<Short, AddressingMode> ADDRESSING_MODES = new HashMap<Short, AddressingMode>();
+	public Map<Byte, AddressingMode> ADDRESSING_MODES = new HashMap<Byte, AddressingMode>();
 	// Cycle Count hashes (CYCLE_COUNTS[operation][addressing_mode] ->
 	// cycle_count)
 	public Map<Operation, Map<AddressingMode, Integer>> CYCLE_COUNTS = new HashMap<Operation, Map<AddressingMode, Integer>>();
