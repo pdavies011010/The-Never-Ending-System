@@ -113,6 +113,18 @@ public class CPU {
 			debugger.addCommand("setBreakpoint", MMC.class.getMethod("__setBreakpoint", String.class), this);
 			debugger.addCommand("clearBreakpoint", MMC.class.getMethod("__clearBreakpoint", String.class), this);
 			debugger.addCommand("clearBreakpoints", MMC.class.getMethod("__clearBreakpoints", String.class), this);
+			debugger.addCommand("getStackPointer", MMC.class.getMethod("__getStackPointer", String.class), this);
+			debugger.addCommand("getProgramCounter", MMC.class.getMethod("__getProgramCounter", String.class), this);
+			debugger.addCommand("getProcessorStatus", MMC.class.getMethod("__getProcessorStatus", String.class), this);
+			debugger.addCommand("getAccumulator", MMC.class.getMethod("__getAccumulator", String.class), this);
+			debugger.addCommand("getX", MMC.class.getMethod("__getX", String.class), this);
+			debugger.addCommand("getY", MMC.class.getMethod("__getY", String.class), this);
+			debugger.addCommand("setStackPointer", MMC.class.getMethod("__setStackPointer", String.class), this);
+			debugger.addCommand("setProgramCounter", MMC.class.getMethod("__setProgramCounter", String.class), this);
+			debugger.addCommand("setProcessorStatus", MMC.class.getMethod("__setProcessorStatus", String.class), this);
+			debugger.addCommand("setAccumulator", MMC.class.getMethod("__setAccumulator", String.class), this);
+			debugger.addCommand("setX", MMC.class.getMethod("__setX", String.class), this);
+			debugger.addCommand("setY", MMC.class.getMethod("__setY", String.class), this);
 
 		} catch (NoSuchMethodException e) {
 			System.out.println(e.getMessage());
@@ -164,5 +176,29 @@ public class CPU {
 	
 	public void __getY(String param) {
 		debugger.debugPrint(String.format("\n%s", Debugger.byteToHex(y)));
+	}
+	
+	public void __setStackPointer(String param) {
+		sp = Debugger.hexToByte(param);
+	}
+	
+	public void __setProgramCounter(String param) {
+		pc = Debugger.hexToInt(param);
+	}
+	
+	public void __setProcessorStatus(String param) {
+		flags = Debugger.hexToByte(param);
+	}
+	
+	public void __setAccumulator(String param) {
+		a = Debugger.hexToByte(param);
+	}
+	
+	public void __setX(String param) {
+		x = Debugger.hexToByte(param);
+	}
+	
+	public void __setY(String param) {
+		y = Debugger.hexToByte(param);
 	}
 }
