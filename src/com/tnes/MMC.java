@@ -5,30 +5,30 @@ public class MMC {
 	private PPU ppu;
 	private Debugger debugger = Debugger.getInstance();
 
-	private byte[] cpuRam = new byte[Constants.CPU_RAM_SIZE];
-	private byte[] cartridgeRam = new byte[Constants.CARTRIDGE_RAM_SIZE];
-	private byte[] cartridgeBankLo = new byte[Constants.CARTRIDGE_BANK_SIZE];
-	private byte[] cartridgeBankHi = new byte[Constants.CARTRIDGE_BANK_SIZE];
+	private short[] cpuRam = new short[Constants.CPU_RAM_SIZE];
+	private short[] cartridgeRam = new short[Constants.CARTRIDGE_RAM_SIZE];
+	private short[] cartridgeBankLo = new short[Constants.CARTRIDGE_BANK_SIZE];
+	private short[] cartridgeBankHi = new short[Constants.CARTRIDGE_BANK_SIZE];
 
-	private byte[] patternTable0 = new byte[Constants.PATTERN_TABLE_SIZE];
-	private byte[] patternTable1 = new byte[Constants.PATTERN_TABLE_SIZE];
-	private byte[] nameTable0 = new byte[Constants.NAME_TABLE_SIZE];
-	private byte[] attributeTable0 = new byte[Constants.ATTRIBUTE_TABLE_SIZE];
-	private byte[] nameTable1 = new byte[Constants.NAME_TABLE_SIZE];
-	private byte[] attributeTable1 = new byte[Constants.ATTRIBUTE_TABLE_SIZE];
-	private byte[] nameTable2 = new byte[Constants.NAME_TABLE_SIZE];
-	private byte[] attributeTable2 = new byte[Constants.ATTRIBUTE_TABLE_SIZE];
-	private byte[] nameTable3 = new byte[Constants.NAME_TABLE_SIZE];
-	private byte[] attributeTable3 = new byte[Constants.ATTRIBUTE_TABLE_SIZE];
-	private byte[] imagePalette = new byte[Constants.PALETTE_SIZE];
-	private byte[] spritePalette = new byte[Constants.PALETTE_SIZE];
-	private byte[] spriteMem = new byte[Constants.SPRITE_MEM_SIZE];
+	private short[] patternTable0 = new short[Constants.PATTERN_TABLE_SIZE];
+	private short[] patternTable1 = new short[Constants.PATTERN_TABLE_SIZE];
+	private short[] nameTable0 = new short[Constants.NAME_TABLE_SIZE];
+	private short[] attributeTable0 = new short[Constants.ATTRIBUTE_TABLE_SIZE];
+	private short[] nameTable1 = new short[Constants.NAME_TABLE_SIZE];
+	private short[] attributeTable1 = new short[Constants.ATTRIBUTE_TABLE_SIZE];
+	private short[] nameTable2 = new short[Constants.NAME_TABLE_SIZE];
+	private short[] attributeTable2 = new short[Constants.ATTRIBUTE_TABLE_SIZE];
+	private short[] nameTable3 = new short[Constants.NAME_TABLE_SIZE];
+	private short[] attributeTable3 = new short[Constants.ATTRIBUTE_TABLE_SIZE];
+	private short[] imagePalette = new short[Constants.PALETTE_SIZE];
+	private short[] spritePalette = new short[Constants.PALETTE_SIZE];
+	private short[] spriteMem = new short[Constants.SPRITE_MEM_SIZE];
 
 	private boolean patternTable0Writable, patternTable1Writable;
 	private boolean screenScrollRegSwitch, ppuMemAddressRegSwitch;
 	private boolean joystickLatchStarted;
-	private byte joystick1Keys, joystick2Keys;
-	private byte joystick1LatchKeys, joystick2LatchKeys;
+	private short joystick1Keys, joystick2Keys;
+	private short joystick1LatchKeys, joystick2LatchKeys;
 
 	public MMC() {
 		patternTable0Writable = false;
@@ -64,71 +64,71 @@ public class MMC {
 		this.ppu = ppu;
 	}
 
-	public byte[] getCpuRam() {
+	public short[] getCpuRam() {
 		return cpuRam;
 	}
 
-	public byte[] getCartridgeRam() {
+	public short[] getCartridgeRam() {
 		return cartridgeRam;
 	}
 
-	public byte[] getCartridgeBankLo() {
+	public short[] getCartridgeBankLo() {
 		return cartridgeBankLo;
 	}
 
-	public byte[] getCartridgeBankHi() {
+	public short[] getCartridgeBankHi() {
 		return cartridgeBankHi;
 	}
 
-	public byte[] getPatternTable0() {
+	public short[] getPatternTable0() {
 		return patternTable0;
 	}
 
-	public byte[] getPatternTable1() {
+	public short[] getPatternTable1() {
 		return patternTable1;
 	}
 
-	public byte[] getNameTable0() {
+	public short[] getNameTable0() {
 		return nameTable0;
 	}
 
-	public byte[] getAttributeTable0() {
+	public short[] getAttributeTable0() {
 		return attributeTable0;
 	}
 
-	public byte[] getNameTable1() {
+	public short[] getNameTable1() {
 		return nameTable1;
 	}
 
-	public byte[] getAttributeTable1() {
+	public short[] getAttributeTable1() {
 		return attributeTable1;
 	}
 
-	public byte[] getNameTable2() {
+	public short[] getNameTable2() {
 		return nameTable2;
 	}
 
-	public byte[] getAttributeTable2() {
+	public short[] getAttributeTable2() {
 		return attributeTable2;
 	}
 
-	public byte[] getNameTable3() {
+	public short[] getNameTable3() {
 		return nameTable3;
 	}
 
-	public byte[] getAttributeTable3() {
+	public short[] getAttributeTable3() {
 		return attributeTable3;
 	}
 
-	public byte[] getImagePalette() {
+	public short[] getImagePalette() {
 		return imagePalette;
 	}
 
-	public byte[] getSpritePalette() {
+	public short[] getSpritePalette() {
 		return spritePalette;
 	}
 
-	public byte[] getSpriteMem() {
+	public short[] getSpriteMem() {
 		return spriteMem;
 	}
 
@@ -172,44 +172,43 @@ public class MMC {
 		this.joystickLatchStarted = joystickLatchStarted;
 	}
 
-	public byte getJoystick1Keys() {
+	public short getJoystick1Keys() {
 		return joystick1Keys;
 	}
 
-	public void setJoystick1Keys(byte joystick1Keys) {
+	public void setJoystick1Keys(short joystick1Keys) {
 		this.joystick1Keys = joystick1Keys;
 	}
 
-	public byte getJoystick2Keys() {
+	public short getJoystick2Keys() {
 		return joystick2Keys;
 	}
 
-	public void setJoystick2Keys(byte joystick2Keys) {
+	public void setJoystick2Keys(short joystick2Keys) {
 		this.joystick2Keys = joystick2Keys;
 	}
 
-	public byte getJoystick1LatchKeys() {
+	public short getJoystick1LatchKeys() {
 		return joystick1LatchKeys;
 	}
 
-	public void setJoystick1LatchKeys(byte joystick1LatchKeys) {
+	public void setJoystick1LatchKeys(short joystick1LatchKeys) {
 		this.joystick1LatchKeys = joystick1LatchKeys;
 	}
 
-	public byte getJoystick2LatchKeys() {
+	public short getJoystick2LatchKeys() {
 		return joystick2LatchKeys;
 	}
 
-	public void setJoystick2LatchKeys(byte joystick2LatchKeys) {
+	public void setJoystick2LatchKeys(short joystick2LatchKeys) {
 		this.joystick2LatchKeys = joystick2LatchKeys;
 	}
 
-	
 	/*
-	 *   MMC Logic
+	 * MMC Logic
 	 */
-	public byte readCPUMem(int address) {
-		byte result = 0;
+	public short readCPUMem(int address) {
+		short result = 0;
 
 		if (address >= Constants.CPU_RAM_LO && address <= Constants.CPU_RAM_HI) {
 			// Read from CPU RAM
@@ -236,10 +235,10 @@ public class MMC {
 			else if (trueAddress == Constants.PPU_CONTROL_REG_2_PORT)
 				result = ppu.getControlReg2();
 			else if (trueAddress == Constants.PPU_STATUS_REG_PORT) {
-				byte status = ppu.getStatus();
+				short status = ppu.getStatus();
 				result = status;
 				// Clear VBLANK flag on read
-				ppu.setStatus((byte) (status & (~Constants.PPU_STAT_VBLANK)));
+				ppu.setStatus((short) (status & (~Constants.PPU_STAT_VBLANK)));
 			} else if (trueAddress == Constants.PPU_SPRITE_MEM_DATA_PORT) {
 				result = spriteMem[ppu.getSpriteMemAddr()];
 				ppu.setSpriteMemAddr(ppu.getSpriteMemAddr() + 1);
@@ -252,10 +251,10 @@ public class MMC {
 					ppu.setPPUMemAddr(ppu.getPPUMemAddr() + 1);
 				}
 			} else if (trueAddress == Constants.JOYSTICK_1_PORT) {
-				result = (byte) (0x40 | (joystick1LatchKeys & 0x01));
+				result = (short) (0x40 | (joystick1LatchKeys & 0x01));
 				joystick1LatchKeys >>= 1;
 			} else if (trueAddress == Constants.JOYSTICK_2_PORT) {
-				result = (byte) (0x40 | (joystick2LatchKeys & 0x01));
+				result = (short) (0x40 | (joystick2LatchKeys & 0x01));
 				joystick2LatchKeys >>= 1;
 			}
 		} else if (address >= Constants.EXPANSION_MODULES_LO && address <= Constants.EXPANSION_MODULES_HI) {
@@ -274,8 +273,8 @@ public class MMC {
 		return result;
 	}
 
-	public byte readCPUMemSafe(int address) {
-		byte result = 0;
+	public short readCPUMemSafe(int address) {
+		short result = 0;
 
 		if (address >= Constants.IO_LO && address <= Constants.IO_HI) {
 			// Read from IO ports
@@ -312,7 +311,7 @@ public class MMC {
 		return result;
 	}
 
-	public void writeCPUMem(int address, byte value) {
+	public void writeCPUMem(int address, short value) {
 		if (address >= Constants.CPU_RAM_LO && address <= Constants.CPU_RAM_HI) {
 			// Write into CPU RAM
 			// Handle mirroring
@@ -371,13 +370,13 @@ public class MMC {
 				ppuMemAddressRegSwitch = (!ppuMemAddressRegSwitch);
 			} else if (trueAddress == Constants.PPU_MEM_DATA_PORT) {
 				writePPUMem(ppu.getPPUMemAddr(), value);
-				debugger.debugPrint(String.format("\nWriting %s to PPU address %s", Debugger.byteToHex(value), Debugger.intToHex(ppu.getPPUMemAddr())));
+				debugger.debugPrint(String.format("\nWriting %s to PPU address %s", Debugger.shortToHex(value), Debugger.intToHex(ppu.getPPUMemAddr())));
 				if (ppu.isVerticalRWFlagSet())
 					ppu.setPPUMemAddr(ppu.getPPUMemAddr() + 32);
 				else
 					ppu.setPPUMemAddr(ppu.getPPUMemAddr() + 1);
 			} else if (trueAddress == Constants.PPU_SPRITE_DMA_PORT) {
-				// Sprite RAM DMA - Transfer 256 bytes of data from CPU mem to
+				// Sprite RAM DMA - Transfer 256 shorts of data from CPU mem to
 				// Sprite RAM
 				// from location at (0x100 * value)
 				int startAddress = value * 0x100;
@@ -411,8 +410,8 @@ public class MMC {
 		}
 	}
 
-	public byte readPPUMem(int address) {
-		byte result = 0;
+	public short readPPUMem(int address) {
+		short result = 0;
 
 		if (address >= Constants.PATTERN_TABLE_0_LO && address <= Constants.PATTERN_TABLE_0_HI)
 			result = patternTable0[address];
@@ -442,7 +441,7 @@ public class MMC {
 		return result;
 	}
 
-	public void writePPUMem(int address, byte value) {
+	public void writePPUMem(int address, short value) {
 		if (address >= Constants.PATTERN_TABLE_0_LO && address <= Constants.PATTERN_TABLE_0_HI && isPatternTable0Writable())
 			patternTable0[address] = value;
 		else if (address >= Constants.PATTERN_TABLE_1_LO && address <= Constants.PATTERN_TABLE_1_HI && isPatternTable1Writable())
@@ -491,12 +490,12 @@ public class MMC {
 	 */
 	public void __getCPUMem(String param) {
 		int address = Integer.parseInt(param);
-		debugger.debugPrint(Debugger.byteToHex(readCPUMemSafe(address)) + "\n");
+		debugger.debugPrint(Debugger.shortToHex(readCPUMemSafe(address)) + "\n");
 	}
 
 	public void __setCPUMem(String param) {
 		int address = Debugger.hexToInt(param.split(",")[0]);
-		byte value = Debugger.hexToByte(param.split(",")[1]);
+		short value = Debugger.hexToByte(param.split(",")[1]);
 		writeCPUMem(address, value);
 	}
 
@@ -509,18 +508,18 @@ public class MMC {
 			if (i % 16 == 0 && i != address0)
 				debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(i)));
 
-			debugger.debugPrint(String.format(" %s", Debugger.byteToHex(readCPUMemSafe(i))));
+			debugger.debugPrint(String.format(" %s", Debugger.shortToHex(readCPUMemSafe(i))));
 		}
 	}
 
 	public void __getPPUMem(String param) {
 		int address = Integer.parseInt(param);
-		debugger.debugPrint(Debugger.byteToHex(readPPUMem(address)) + "\n");
+		debugger.debugPrint(Debugger.shortToHex(readPPUMem(address)) + "\n");
 	}
 
 	public void __setPPUMem(String param) {
 		int address = Debugger.hexToInt(param.split(",")[0]);
-		byte value = Debugger.hexToByte(param.split(",")[1]);
+		short value = Debugger.hexToByte(param.split(",")[1]);
 		writePPUMem(address, value);
 	}
 
@@ -533,18 +532,18 @@ public class MMC {
 			if (i % 16 == 0 && i != address0)
 				debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(i)));
 
-			debugger.debugPrint(String.format(" %s", Debugger.byteToHex(readPPUMem(i))));
+			debugger.debugPrint(String.format(" %s", Debugger.shortToHex(readPPUMem(i))));
 		}
 	}
 
 	public void __getSpriteMem(String param) {
 		int address = Integer.parseInt(param);
-		debugger.debugPrint(Debugger.byteToHex(spriteMem[address]) + "\n");
+		debugger.debugPrint(Debugger.shortToHex(spriteMem[address]) + "\n");
 	}
 
 	public void __setSpriteMem(String param) {
 		int address = Debugger.hexToInt(param.split(",")[0]);
-		byte value = Debugger.hexToByte(param.split(",")[1]);
+		short value = Debugger.hexToByte(param.split(",")[1]);
 		spriteMem[address] = value;
 	}
 
@@ -557,7 +556,7 @@ public class MMC {
 			if (i % 16 == 0 && i != address0)
 				debugger.debugPrint(String.format("\n%s:", Debugger.intToHex(i)));
 
-			debugger.debugPrint(String.format(" %s", Debugger.byteToHex(spriteMem[i])));
+			debugger.debugPrint(String.format(" %s", Debugger.shortToHex(spriteMem[i])));
 		}
 	}
 }

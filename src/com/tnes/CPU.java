@@ -8,12 +8,12 @@ public class CPU {
 	private CpuTables cpuTables = CpuTables.getInstance();
 	private Debugger debugger = Debugger.getInstance();
 
-	private byte sp;
+	private short sp;
 	private int pc;
-	private byte flags;
-	private byte a;
-	private byte x;
-	private byte y;
+	private short flags;
+	private short a;
+	private short x;
+	private short y;
 	private boolean pageBoundaryCrossed = false;
 
 	// Debug stuff
@@ -26,17 +26,17 @@ public class CPU {
 		this.mmc = mmc;
 
 		// CPU is not responsible for initializing the stack
-		sp = (byte) 0xFF;
+		sp = (short) 0xFF;
 
 		// Start PC at reset vector
-		pc = (mmc.readCPUMem(Constants.RESET_HI) << 8) + mmc.readCPUMem(Constants.RESET_LO);
+		pc = (((int) mmc.readCPUMem(Constants.RESET_HI)) << 8) + mmc.readCPUMem(Constants.RESET_LO);
 
 		// Initialize registers
 		a = 0;
 		x = 0;
 		y = 0;
 		// All but the unused flag are cleared to 0
-		flags = (byte) 0x20;
+		flags = (short) 0x20;
 
 		// Debug stuff
 		breakpoints = new ArrayList<Integer>();
@@ -58,11 +58,11 @@ public class CPU {
 		this.mmc = mmc;
 	}
 
-	public byte getSP() {
+	public short getSP() {
 		return sp;
 	}
 
-	public void setSP(byte sp) {
+	public void setSP(short sp) {
 		this.sp = sp;
 	}
 
@@ -74,35 +74,35 @@ public class CPU {
 		this.pc = pc;
 	}
 
-	public byte getFlags() {
+	public short getFlags() {
 		return flags;
 	}
 
-	public void setFlags(byte flags) {
+	public void setFlags(short flags) {
 		this.flags = flags;
 	}
 
-	public byte getA() {
+	public short getA() {
 		return a;
 	}
 
-	public void setA(byte a) {
+	public void setA(short a) {
 		this.a = a;
 	}
 
-	public byte getX() {
+	public short getX() {
 		return x;
 	}
 
-	public void setX(byte x) {
+	public void setX(short x) {
 		this.x = x;
 	}
 
-	public byte getY() {
+	public short getY() {
 		return y;
 	}
 
-	public void setY(byte y) {
+	public void setY(short y) {
 		this.y = y;
 	}
 
@@ -195,11 +195,275 @@ public class CPU {
 	 */
 	public void reset() {
 		// Reset - load PC with with appropriate location from reset vector
-		pc = (mmc.readCPUMem(Constants.RESET_HI) << 8) | mmc.readCPUMem(Constants.RESET_LO);
+		pc = (((int) mmc.readCPUMem(Constants.RESET_HI)) << 8) | mmc.readCPUMem(Constants.RESET_LO);
 
-		debugger.debugPrint("\nReset.");
 		if (logCPUState)
 			debugger.debugLog("\nReset.");
+	}
+
+	public void NMI() {
+		/*
+		 * Non-Maskable interrupt - Load the PC with the appropraite location
+		 * from the NMI vector First prepare the CPU
+		 */
+		// Push program counter on stack, high short first
+		push((short) ((pc >> 8) & 0xFF));
+		push((short) (pc & 0xFF));
+
+		// Push status register on the stack
+		push(flags);
+
+		int hi = ((int) mmc.readCPUMem(Constants.NMIB_HI)) << 8;
+		pc = hi | mmc.readCPUMem(Constants.NMIB_LO);
+
+		if (logCPUState)
+			debugger.debugLog("\nNMI.");
+	}
+
+	public int execute() {
+		// Execute a single instruction and return cycle count
+		int cycleCount = 0;
+		short opcode = mmc.readCPUMem(pc);
+		Operation operation = cpuTables.Operations.get(opcode);
+		AddressingMode addressingMode = cpuTables.AdressingModes.get(opcode);
+		int address = getInstructionAddress(operation, addressingMode);
+
+		/*
+		 * Note!!! - We are only calculating this for the addressing modes for
+		 * which it actually matters in terms of cycle counting, namely AbsX,
+		 * AbsY, IndY and Rel
+		 */
+		pageBoundaryCrossed = false;
+		int cycleOffset = 0;
+
+		// Handle debugging stuff
+		if (step || breakpoints.contains(pc)) {
+			// Write out CPU state to screen or log
+			debugRead = true;
+			short debugData = getInstructionData(operation, addressingMode);
+
+			if (!step)
+				debugger.debugPrint("\nBreakpoint hit.");
+
+			debugger.execCommand("getCPUState", String.format("%d,%d", address, debugData));
+			/*
+			 * TODO: Need to figure out how readCommands will work... NIO, etc.
+			 */
+			// debugger.readCommands();
+		}
+
+		// Perform logging if enabled
+		if (logCPUState) {
+			debugRead = true;
+			short debugData = getInstructionData(operation, addressingMode);
+			debugger.execCommand("logCPUState", String.format("%d,%d", address, debugData));
+		}
+
+		// Disable debug reading (reads will affect registers, etc.)
+		debugRead = false;
+
+		switch (operation) {
+		case ADC:
+			break;
+		}
+
+		return cycleCount;
+	}
+
+	/*
+	 * Stack Operations
+	 */
+	private void push(short val) {
+		if (sp > 0) {
+			mmc.writeCPUMem(Constants.CPU_STACK_LO + sp, val);
+			sp--;
+		} else {
+			// Error occurred, stack overflow
+			debugger.debugPrint("\nStack Overflow Occurred");
+			debugger.debugLog("\nStack Overflow Occurred");
+			// debugger.debugGetCommands();
+		}
+	}
+
+	private short pop() {
+		short result = (short) 0xFF;
+		if (sp < 0xFF) {
+			sp++;
+			result = mmc.readCPUMem(Constants.CPU_STACK_LO + sp);
+		} else {
+			// Error occurred, stack underflow
+			debugger.debugPrint("\nStack Underflow Occurred");
+			debugger.debugLog("\nStack Underflow Occurred");
+			// debugger.debugGetCommands();
+		}
+
+		return result;
+	}
+
+	/*
+	 * Utility Methods
+	 */
+	private int getInstructionAddress(Operation operation, AddressingMode addressingMode) {
+
+		switch (addressingMode) {
+		case IMMEDIATE:
+			return getImmediateAddress();
+		case ABSOLUTE:
+			return getAbsoluteAddress(false, false);
+		case ZERO_PAGE:
+			return getZeroPageAddress(false, false);
+		case ZERO_PAGE_X_INDEXED:
+			return getZeroPageAddress(true, false);
+		case ZERO_PAGE_Y_INDEXED:
+			return getZeroPageAddress(false, true);
+		case ABSOLUTE_X_INDEXED:
+			return getAbsoluteAddress(true, false);
+		case ABSOLUTE_Y_INDEXED:
+			return getAbsoluteAddress(false, true);
+		case INDIRECT:
+			return getIndirectAddress();
+		case PRE_INDEXED_INDIRECT:
+			return getPreIndexedIndirectAddress();
+		case POST_INDEXED_INDIRECT:
+			return getPostIndexedIndirectAddress();
+		case RELATIVE:
+			return getRelativeAddress(cpuTables.ByteCounts.get(operation).get(addressingMode));
+		}
+
+		return 0;
+	}
+
+	private short getInstructionData(Operation operation, AddressingMode addressingMode) {
+		switch (addressingMode) {
+		case IMMEDIATE:
+			return getImmediateValue();
+		case ABSOLUTE:
+			return getAbsoluteValue(false, false);
+		case ZERO_PAGE:
+			return getZeroPageValue(false, false);
+		case ACCUMULATOR:
+			return a;
+		case ZERO_PAGE_X_INDEXED:
+			return getAbsoluteValue(true, false);
+		case ZERO_PAGE_Y_INDEXED:
+			return getAbsoluteValue(false, true);
+		case ABSOLUTE_X_INDEXED:
+			return getAbsoluteValue(true, false);
+		case ABSOLUTE_Y_INDEXED:
+			return getAbsoluteValue(false, true);
+		case PRE_INDEXED_INDIRECT:
+			return getPreIndexedIndirectValue();
+		case POST_INDEXED_INDIRECT:
+			return getPostIndexedIndirectValue();
+		}
+
+		return (short) 0;
+	}
+
+	private void calcSignFlag(short val) {
+		setSignFlag((val & 80) != 0);
+	}
+
+	private void calcZeroFlag(short val) {
+		setZeroFlag(val == 0);
+	}
+
+	/*
+	 * Methods to get address / data based on addressing mode
+	 */
+	private int getImmediateAddress() {
+		return pc + 1;
+	}
+
+	private short getImmediateValue() {
+		return debugRead ? mmc.readCPUMemSafe(getImmediateAddress()) : mmc.readCPUMem(getImmediateAddress());
+	}
+
+	private int getZeroPageAddress(boolean xIndexed, boolean yIndexed) {
+		int address = mmc.readCPUMem(pc + 1);
+
+		address += xIndexed ? x : 0;
+		address += yIndexed ? y : 0;
+
+		return address;
+	}
+
+	private short getZeroPageValue(boolean xIndexed, boolean yIndexed) {
+		return debugRead ? mmc.readCPUMemSafe(getZeroPageAddress(xIndexed, yIndexed)) : mmc.readCPUMem(getZeroPageAddress(xIndexed, yIndexed));
+	}
+
+	private int getAbsoluteAddress(boolean xIndexed, boolean yIndexed) {
+		// Address is stored low short first
+		int hi = ((int) (mmc.readCPUMem(pc + 2))) << 8;
+		int address = hi + mmc.readCPUMem(pc + 1);
+
+		if (xIndexed) {
+			pageBoundaryCrossed = ((address & 0xFF00) != ((address + x) & 0xFF00));
+			address += x;
+		} else if (yIndexed) {
+			pageBoundaryCrossed = ((address & 0xFF00) != ((address + y) & 0xFF00));
+			address += y;
+		}
+
+		return address;
+	}
+
+	private short getAbsoluteValue(boolean xIndexed, boolean yIndexed) {
+		return debugRead ? mmc.readCPUMemSafe(getAbsoluteAddress(xIndexed, yIndexed)) : mmc.readCPUMem(getAbsoluteAddress(xIndexed, yIndexed));
+	}
+
+	private int getIndirectAddress() {
+		// Address Location and actual address are stored low short first
+		int addressLocationHi = ((int) (mmc.readCPUMem(pc + 2))) << 8;
+		int addressLocation = addressLocationHi + mmc.readCPUMem(pc + 1);
+		int hi = ((int) mmc.readCPUMem(addressLocation + 1)) << 8;
+		return hi + mmc.readCPUMem(addressLocation);
+	}
+
+	private int getPreIndexedIndirectAddress() {
+		// Address location is added to (indexed by) the X register
+		int addressLocation = mmc.readCPUMem(pc + 1) + x;
+
+		// Address is stored low short first
+		int hi = ((int) mmc.readCPUMem(addressLocation + 1)) << 8;
+		return hi + mmc.readCPUMem(addressLocation);
+	}
+
+	private short getPreIndexedIndirectValue() {
+		return debugRead ? mmc.readCPUMemSafe(getPreIndexedIndirectAddress()) : mmc.readCPUMem(getPreIndexedIndirectAddress());
+	}
+
+	private int getPostIndexedIndirectAddress() {
+		int addressLocation = mmc.readCPUMem(pc + 1);
+
+		// Address is stored low short first, and is added to (indexed by) the Y
+		// register
+		int hi = ((int) mmc.readCPUMem(addressLocation + 1)) << 8;
+		int address = hi + mmc.readCPUMem(addressLocation);
+
+		pageBoundaryCrossed = ((address & 0xFF00) != ((address + y) & 0xFF00));
+
+		return address + y;
+	}
+
+	private short getPostIndexedIndirectValue() {
+		return debugRead ? mmc.readCPUMemSafe(getPostIndexedIndirectAddress()) : mmc.readCPUMem(getPostIndexedIndirectAddress());
+	}
+
+	private int getRelativeAddress(int operandOffset) {
+		short addressOffset = mmc.readCPUMem(pc + 1);
+		int address = 0;
+
+		// Address offset is treated as a signed number
+		if ((addressOffset & 0x80) == 0) {
+			pageBoundaryCrossed = (((pc + operandOffset) & 0xFF00) != ((pc + addressOffset) & 0xFF00));
+			address = pc + addressOffset;
+		} else {
+			pageBoundaryCrossed = (((pc + operandOffset) & 0xFF00) != ((pc + ~(0xFF - addressOffset)) & 0xFF00));
+			address = pc + (~(0xFF - addressOffset));
+		}
+
+		return address;
 	}
 
 	private void addDebugCommands() {
@@ -255,7 +519,7 @@ public class CPU {
 	}
 
 	public void __getStackPointer(String param) {
-		debugger.debugPrint(String.format("\n%s", Debugger.byteToHex(sp)));
+		debugger.debugPrint(String.format("\n%s", Debugger.shortToHex(sp)));
 	}
 
 	public void __getProgramCounter(String param) {
@@ -263,19 +527,19 @@ public class CPU {
 	}
 
 	public void __getProcessorStatus(String param) {
-		debugger.debugPrint(String.format("\n%s", Debugger.byteToHex(flags)));
+		debugger.debugPrint(String.format("\n%s", Debugger.shortToHex(flags)));
 	}
 
 	public void __getAccumulator(String param) {
-		debugger.debugPrint(String.format("\n%s", Debugger.byteToHex(a)));
+		debugger.debugPrint(String.format("\n%s", Debugger.shortToHex(a)));
 	}
 
 	public void __getX(String param) {
-		debugger.debugPrint(String.format("\n%s", Debugger.byteToHex(x)));
+		debugger.debugPrint(String.format("\n%s", Debugger.shortToHex(x)));
 	}
 
 	public void __getY(String param) {
-		debugger.debugPrint(String.format("\n%s", Debugger.byteToHex(y)));
+		debugger.debugPrint(String.format("\n%s", Debugger.shortToHex(y)));
 	}
 
 	public void __setStackPointer(String param) {
@@ -303,42 +567,36 @@ public class CPU {
 	}
 
 	public void __getCPUState(String param) {
-		byte opcode = mmc.readCPUMemSafe(pc);
-		Operation operation = cpuTables.OPERATIONS.get(opcode);
-		AddressingMode addressingMode = cpuTables.ADDRESSING_MODES.get(opcode);
+		short opcode = mmc.readCPUMemSafe(pc);
+		Operation operation = cpuTables.Operations.get(opcode);
+		AddressingMode addressingMode = cpuTables.AdressingModes.get(opcode);
 
 		/*
 		 * Address and Data have to be passed in, because reading from the mem
 		 * map can change what's in memory.
-		 * 
-		 * TODO: Note, this was carried over from the ruby version of the app,
-		 * not sure if that's still true using readCPUMemSafe
 		 */
 		int address = Integer.parseInt(param.split(",")[0]);
-		byte data = Byte.parseByte(param.split(",")[1]);
+		short data = Byte.parseByte(param.split(",")[1]);
 
 		debugger.debugPrint(String.format("\nOperation: %s  Addressing Mode: %s  Address: %s  Data: %s", operation.toString(), addressingMode.toString(), address, data));
-		debugger.debugPrint(String.format("\nPC: %s  SP: %s  A: %s  X: %s  Y: %s", Debugger.intToHex(pc), Debugger.byteToHex(sp), Debugger.byteToHex(a), Debugger.byteToHex(x), Debugger.byteToHex(y)));
+		debugger.debugPrint(String.format("\nPC: %s  SP: %s  A: %s  X: %s  Y: %s", Debugger.intToHex(pc), Debugger.shortToHex(sp), Debugger.shortToHex(a), Debugger.shortToHex(x), Debugger.shortToHex(y)));
 		debugger.debugPrint(String.format("\nStatus: S-%d  V-%d  B-%d  D-%d  I-%d  Z-%d  C-%d", isSignFlagSet() ? 1 : 0, isOverflowFlagSet() ? 1 : 0, isBreakFlagSet() ? 1 : 0, isDecimalFlagSet() ? 1 : 0, isInterruptFlagSet() ? 1 : 0, isZeroFlagSet() ? 1 : 0, isCarryFlagSet() ? 1 : 0));
 	}
 
 	public void __logCPUState(String param) {
-		byte opcode = mmc.readCPUMemSafe(pc);
-		Operation operation = cpuTables.OPERATIONS.get(opcode);
-		AddressingMode addressingMode = cpuTables.ADDRESSING_MODES.get(opcode);
+		short opcode = mmc.readCPUMemSafe(pc);
+		Operation operation = cpuTables.Operations.get(opcode);
+		AddressingMode addressingMode = cpuTables.AdressingModes.get(opcode);
 
 		/*
 		 * Address and Data have to be passed in, because reading from the mem
 		 * map can change what's in memory.
-		 * 
-		 * TODO: Note, this was carried over from the ruby version of the app,
-		 * not sure if that's still true using readCPUMemSafe
 		 */
 		int address = Integer.parseInt(param.split(",")[0]);
-		byte data = Byte.parseByte(param.split(",")[1]);
+		short data = Byte.parseByte(param.split(",")[1]);
 
 		debugger.debugLog(String.format("\nOperation: %s  Addressing Mode: %s  Address: %s  Data: %s", operation.toString(), addressingMode.toString(), address, data));
-		debugger.debugLog(String.format("\nPC: %s  SP: %s  A: %s  X: %s  Y: %s", Debugger.intToHex(pc), Debugger.byteToHex(sp), Debugger.byteToHex(a), Debugger.byteToHex(x), Debugger.byteToHex(y)));
+		debugger.debugLog(String.format("\nPC: %s  SP: %s  A: %s  X: %s  Y: %s", Debugger.intToHex(pc), Debugger.shortToHex(sp), Debugger.shortToHex(a), Debugger.shortToHex(x), Debugger.shortToHex(y)));
 		debugger.debugLog(String.format("\nStatus: S-%d  V-%d  B-%d  D-%d  I-%d  Z-%d  C-%d", isSignFlagSet() ? 1 : 0, isOverflowFlagSet() ? 1 : 0, isBreakFlagSet() ? 1 : 0, isDecimalFlagSet() ? 1 : 0, isInterruptFlagSet() ? 1 : 0, isZeroFlagSet() ? 1 : 0, isCarryFlagSet() ? 1 : 0));
 	}
 

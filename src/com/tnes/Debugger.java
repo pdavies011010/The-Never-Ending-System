@@ -110,7 +110,7 @@ public class Debugger {
 		return String.format("%x", value);
 	}
 
-	public static String byteToHex(byte value) {
+	public static String shortToHex(short value) {
 		return String.format("%x", value);
 	}
 
@@ -118,7 +118,7 @@ public class Debugger {
 		return Integer.parseInt(value, 16);
 	}
 
-	public static byte hexToByte(String value) {
+	public static short hexToByte(String value) {
 		return Byte.parseByte(value, 16);
 	}
 

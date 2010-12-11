@@ -118,8 +118,8 @@ public class Constants {
 	/*
 	 * Status Flag
 	 */
-	public static byte PPU_STAT_HIT = (byte) 0x40;
-	public static byte PPU_STAT_VBLANK = (byte) 0x80;
+	public static short PPU_STAT_HIT = (short) 0x40;
+	public static short PPU_STAT_VBLANK = (short) 0x80;
 
 	/*
 	 * Control Register Flags

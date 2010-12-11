@@ -2,14 +2,14 @@ package com.tnes;
 
 public class PPU {
 	private MMC mmc;
-	private byte nameTableMirroring;
-	private byte controlReg1, controlReg2, status;
+	private short nameTableMirroring;
+	private short controlReg1, controlReg2, status;
 	private int spriteMemAddr, ppuMemAddr;
-	private byte verticalScrollReg, horizontalScrollReg;
-	private byte[][] screenBuffer = new byte[241][256];
-	private byte scanline;
+	private short verticalScrollReg, horizontalScrollReg;
+	private short[][] screenBuffer = new short[241][256];
+	private short scanline;
 	private int elapsedCycles;
-	private byte backgroundColor;
+	private short backgroundColor;
 	private boolean frameComplete;
 
 	public PPU(MMC mmc) {
@@ -24,35 +24,35 @@ public class PPU {
 		this.mmc = mmc;
 	}
 
-	public byte getNameTableMirroring() {
+	public short getNameTableMirroring() {
 		return nameTableMirroring;
 	}
 
-	public void setNameTableMirroring(byte nameTableMirroring) {
+	public void setNameTableMirroring(short nameTableMirroring) {
 		this.nameTableMirroring = nameTableMirroring;
 	}
 
-	public byte getControlReg1() {
+	public short getControlReg1() {
 		return controlReg1;
 	}
 
-	public void setControlReg1(byte controlReg1) {
+	public void setControlReg1(short controlReg1) {
 		this.controlReg1 = controlReg1;
 	}
 
-	public byte getControlReg2() {
+	public short getControlReg2() {
 		return controlReg2;
 	}
 
-	public void setControlReg2(byte controlReg2) {
+	public void setControlReg2(short controlReg2) {
 		this.controlReg2 = controlReg2;
 	}
 
-	public byte getStatus() {
+	public short getStatus() {
 		return status;
 	}
 
-	public void setStatus(byte status) {
+	public void setStatus(short status) {
 		this.status = status;
 	}
 
@@ -72,27 +72,27 @@ public class PPU {
 		this.ppuMemAddr = ppuMemAddr;
 	}
 
-	public byte getVerticalScrollReg() {
+	public short getVerticalScrollReg() {
 		return verticalScrollReg;
 	}
 
-	public void setVerticalScrollReg(byte verticalScrollReg) {
+	public void setVerticalScrollReg(short verticalScrollReg) {
 		this.verticalScrollReg = verticalScrollReg;
 	}
 
-	public byte getHorizontalScrollReg() {
+	public short getHorizontalScrollReg() {
 		return horizontalScrollReg;
 	}
 
-	public void setHorizontalScrollReg(byte horizontalScrollReg) {
+	public void setHorizontalScrollReg(short horizontalScrollReg) {
 		this.horizontalScrollReg = horizontalScrollReg;
 	}
 
-	public byte[][] getScreenBuffer() {
+	public short[][] getScreenBuffer() {
 		return screenBuffer;
 	}
 
-	public byte getScanline() {
+	public short getScanline() {
 		return scanline;
 	}
 
@@ -109,18 +109,18 @@ public class PPU {
 		return ((controlReg1 & Constants.PPU_CTRL_1_VERTICAL_WRITE) != 0) ? true : false;
 	}
 
-	public byte getBackgroundColorBits() {
-		byte result = (byte) (controlReg2 >> 5);
+	public short getBackgroundColorBits() {
+		short result = (short) (controlReg2 >> 5);
 		return result;
 	}
 
-	public void set_background_color_bits(byte value) {
+	public void set_background_color_bits(short value) {
 		controlReg2 &= ~Constants.PPU_CTRL_2_BKG_COLOR_MASK;
-		controlReg2 |= (value << (byte) 5);
+		controlReg2 |= (value << (short) 5);
 	}
 
 	public void updateBackgroundColor() {
-		byte color = getBackgroundColorBits();
+		short color = getBackgroundColorBits();
 
 		// Default to Black
 		backgroundColor = 0x0F;
