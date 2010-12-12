@@ -262,9 +262,247 @@ public class CPU {
 		// Disable debug reading (reads will affect registers, etc.)
 		debugRead = false;
 
+		short data = 0;
+		short temp = 0;
 		switch (operation) {
 		case ADC:
+			data = getInstructionData(operation, addressingMode);
+			temp = (short) (data + a + (isCarryFlagSet() ? 1 : 0));
+			calcZeroFlag(temp);
+
+			/*
+			 * Note, most of the following logic comes directly from the VICE
+			 * emulator. Need to understand it better.
+			 */
+			if (isDecimalFlagSet()) {
+				if (((a & 0xF) + (temp & 0xF) + (isCarryFlagSet() ? 1 : 0)) > 9) {
+					temp += 6;
+				}
+
+				calcSignFlag(temp);
+				setOverflowFlag((((a ^ data) & 0x80) == 0) && (((a ^ temp) & 0x80) != 0));
+
+				if (temp > 0x99) {
+					temp += 96;
+				}
+
+				setCarryFlag(temp > 0x99);
+			} else {
+				calcSignFlag(temp);
+				setOverflowFlag((((a ^ data) & 0x80) == 0) && (((a ^ temp) & 0x80) != 0));
+				setCarryFlag(temp > 0xFF);
+			}
+
+			a = (short) (temp & 0xFF);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			cycleOffset = pageBoundaryCrossed ? 1 : 0;
 			break;
+
+		case AND:
+			data = getInstructionData(operation, addressingMode);
+			temp = (short) (data & a);
+			calcZeroFlag(temp);
+			calcSignFlag(temp);
+			a = temp;
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+
+			cycleOffset = pageBoundaryCrossed ? 1 : 0;
+			break;
+
+		case ASL:
+			data = getInstructionData(operation, addressingMode);
+			setCarryFlag((data & 0x80) != 0);
+			data <<= 1;
+			calcZeroFlag(data);
+			calcSignFlag(data);
+			if (addressingMode == AddressingMode.ACCUMULATOR) {
+				a = data;
+			} else {
+				mmc.writeCPUMem(address, data);
+			}
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+
+			break;
+
+		case BCC:
+			if (!isCarryFlagSet()) {
+				pc = address;
+				cycleOffset = pageBoundaryCrossed ? 2 : 1;
+			}
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case BCS:
+			if (isCarryFlagSet()) {
+				pc = address;
+				cycleOffset = pageBoundaryCrossed ? 2 : 1;
+			}
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case BEQ:
+			if (isZeroFlagSet()) {
+				pc = address;
+				cycleOffset = pageBoundaryCrossed ? 2 : 1;
+			}
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case BIT:
+			data = getInstructionData(operation, addressingMode);
+
+			calcSignFlag(data);
+			setOverflowFlag((data & 0x40) != 0);
+			calcZeroFlag((short) (data & a));
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+
+			break;
+
+		case BMI:
+			if (isSignFlagSet()) {
+				pc = address;
+				cycleOffset = pageBoundaryCrossed ? 2 : 1;
+			}
+
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case BNE:
+			if (!isZeroFlagSet()) {
+				pc = address;
+				cycleOffset = pageBoundaryCrossed ? 2 : 1;
+			}
+
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case BPL:
+			if (!isSignFlagSet()) {
+				pc = address;
+				cycleOffset = pageBoundaryCrossed ? 2 : 1;
+			}
+
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case BRK:
+			pc += 1;
+			// Push program counter on stack, high byte first
+			push((short) ((pc >> 8) & 0xFF));
+			push((short) (pc & 0xFF));
+
+			// Set the break flag then push the status register on the stack
+			setBreakFlag(true);
+			push(flags);
+
+			address = (mmc.readCPUMem(Constants.IRQ_BRK_HI) << 8) + mmc.readCPUMem(Constants.IRQ_BRK_LO);
+			pc = address;
+
+			// Lastly set the interrupt disable flag
+			setInterruptFlag(true);
+			break;
+
+		case BVC:
+			if (!isOverflowFlagSet()) {
+				pc = address;
+				cycleOffset = pageBoundaryCrossed ? 2 : 1;
+			}
+
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case BVS:
+			if (isOverflowFlagSet()) {
+				pc = address;
+				cycleOffset = pageBoundaryCrossed ? 2 : 1;
+			}
+
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+			
+		case CLC:
+			setCarryFlag(false);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+			
+		case CLD:
+			setDecimalFlag(false);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+			
+		case CLI:
+			setInterruptFlag(false);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+			
+		case CLV:
+			setOverflowFlag(false);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+			
+		case CMP:
+			data = getInstructionData(operation, addressingMode);
+			
+			temp = (short) (a - data);
+			setCarryFlag(temp < 0x100);
+			calcSignFlag(temp);
+			calcZeroFlag(temp);
+			
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			
+			cycleOffset = pageBoundaryCrossed ? 1 : 0;
+			break;
+			
+		case CPX:
+			data = getInstructionData(operation, addressingMode);
+			
+			temp = (short) (x - data);
+			setCarryFlag(temp < 0x100);
+			calcSignFlag(temp);
+			calcZeroFlag(temp);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+			
+		case CPY:
+			data = getInstructionData(operation, addressingMode);
+			
+			temp = (short) (y - data);
+			setCarryFlag(temp < 0x100);
+			calcSignFlag(temp);
+			calcZeroFlag(temp);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+			
+		case DEC:
+			data = getInstructionData(operation, addressingMode);
+			
+			data = (short)((data - 1) & 0xFF);
+			calcSignFlag(data);
+			calcZeroFlag(data);
+			mmc.writeCPUMem(address, data);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+			
+		case DEX:
+			x = (short)((x - 1) & 0xFF);
+			calcSignFlag(x);
+			calcZeroFlag(x);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+			
+		case DEY:
+			y = (short)((y - 1) & 0xFF);
+			calcSignFlag(y);
+			calcZeroFlag(y);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+		}
+
+		try {
+			cycleCount = cpuTables.CycleCounts.get(operation).get(addressingMode) + cycleOffset;
+		} catch (Exception e) {
+			debugger.debugPrint("\nSomething's Wrong! Invalid operation or addressing mode");
+			// debugger.getCommands();
 		}
 
 		return cycleCount;
