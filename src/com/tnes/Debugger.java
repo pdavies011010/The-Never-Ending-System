@@ -1,8 +1,10 @@
 package com.tnes;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -86,6 +88,44 @@ public class Debugger {
 	 */
 	public void addCommand(String name, Method method, Object contextObject) {
 		commands.put(name, new DebuggerCommand(method, contextObject));
+	}
+
+	public boolean readCommand() {
+		// Variable indicating whether a command was received
+		boolean result = false;
+		if (!debugging)
+			return result;
+
+		System.out.println("\nCommand>>");
+		InputStreamReader converter = new InputStreamReader(System.in);
+		BufferedReader reader = new BufferedReader(converter);
+		try {
+			String commandLine = reader.readLine();
+			if ("?".equals(commandLine)) {
+				System.out.println("Commands: ");
+				StringBuffer buffer = new StringBuffer("");
+				for (String key : commands.keySet()) {
+					buffer.append(key).append("\n");
+				}
+				result = true;
+			} else if (commandLine != null && !commandLine.isEmpty()) {
+				String command = commandLine.split(" ")[0];
+				String param = commandLine.split(" ")[1];
+				execCommand(command, param);
+				result = true;
+			}
+		} catch (IOException e) {
+			debugPrint("Error reading from input.");
+		}
+
+		return result;
+	}
+
+	public void readCommands() {
+		boolean commandReceived = true;
+		while (commandReceived) {
+			commandReceived = readCommand();
+		}
 	}
 
 	/*

@@ -246,10 +246,7 @@ public class CPU {
 				debugger.debugPrint("\nBreakpoint hit.");
 
 			debugger.execCommand("getCPUState", String.format("%d,%d", address, debugData));
-			/*
-			 * TODO: Need to figure out how readCommands will work... NIO, etc.
-			 */
-			// debugger.readCommands();
+			debugger.readCommands();
 		}
 
 		// Perform logging if enabled
@@ -802,7 +799,7 @@ public class CPU {
 			cycleCount = cpuTables.CycleCounts.get(operation).get(addressingMode) + cycleOffset;
 		} catch (Exception e) {
 			debugger.debugPrint("\nSomething's Wrong! Invalid operation or addressing mode");
-			// debugger.getCommands();
+			debugger.readCommands();
 		}
 
 		return cycleCount;
