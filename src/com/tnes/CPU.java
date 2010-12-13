@@ -419,83 +419,383 @@ public class CPU {
 
 			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
 			break;
-			
+
 		case CLC:
 			setCarryFlag(false);
 			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
 			break;
-			
+
 		case CLD:
 			setDecimalFlag(false);
 			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
 			break;
-			
+
 		case CLI:
 			setInterruptFlag(false);
 			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
 			break;
-			
+
 		case CLV:
 			setOverflowFlag(false);
 			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
 			break;
-			
+
 		case CMP:
 			data = getInstructionData(operation, addressingMode);
-			
+
 			temp = (short) (a - data);
 			setCarryFlag(temp < 0x100);
 			calcSignFlag(temp);
 			calcZeroFlag(temp);
-			
+
 			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
-			
+
 			cycleOffset = pageBoundaryCrossed ? 1 : 0;
 			break;
-			
+
 		case CPX:
 			data = getInstructionData(operation, addressingMode);
-			
+
 			temp = (short) (x - data);
 			setCarryFlag(temp < 0x100);
 			calcSignFlag(temp);
 			calcZeroFlag(temp);
 			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
 			break;
-			
+
 		case CPY:
 			data = getInstructionData(operation, addressingMode);
-			
+
 			temp = (short) (y - data);
 			setCarryFlag(temp < 0x100);
 			calcSignFlag(temp);
 			calcZeroFlag(temp);
 			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
 			break;
-			
+
 		case DEC:
 			data = getInstructionData(operation, addressingMode);
-			
-			data = (short)((data - 1) & 0xFF);
+
+			data = (short) ((data - 1) & 0xFF);
 			calcSignFlag(data);
 			calcZeroFlag(data);
 			mmc.writeCPUMem(address, data);
 			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
 			break;
-			
+
 		case DEX:
-			x = (short)((x - 1) & 0xFF);
+			x = (short) ((x - 1) & 0xFF);
 			calcSignFlag(x);
 			calcZeroFlag(x);
 			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
 			break;
-			
+
 		case DEY:
-			y = (short)((y - 1) & 0xFF);
+			y = (short) ((y - 1) & 0xFF);
 			calcSignFlag(y);
 			calcZeroFlag(y);
 			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
 			break;
+
+		case EOR:
+			data = getInstructionData(operation, addressingMode);
+
+			temp = (short) (data ^ a);
+			calcZeroFlag(temp);
+			calcSignFlag(temp);
+			a = temp;
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+
+			cycleOffset = pageBoundaryCrossed ? 1 : 0;
+			break;
+
+		case INC:
+			data = getInstructionData(operation, addressingMode);
+
+			data = (short) ((data + 1) & 0xFF);
+			calcSignFlag(data);
+			calcZeroFlag(data);
+			mmc.writeCPUMem(address, data);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case INX:
+			x = (short) ((x + 1) & 0xFF);
+			calcSignFlag(x);
+			calcZeroFlag(x);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case INY:
+			y = (short) ((y + 1) & 0xFF);
+			calcSignFlag(y);
+			calcZeroFlag(y);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case JMP:
+			pc = address;
+			break;
+
+		case JSR:
+			pc += 2;
+			// Push the high byte first
+			push((short) ((pc >> 8) & 0xFF));
+			push((short) (pc & 0xFF));
+			pc = address;
+			break;
+
+		case LDA:
+			data = getInstructionData(operation, addressingMode);
+
+			calcSignFlag(data);
+			calcZeroFlag(data);
+			a = data;
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+
+			cycleOffset = pageBoundaryCrossed ? 1 : 0;
+			break;
+
+		case LDX:
+			data = getInstructionData(operation, addressingMode);
+
+			calcSignFlag(data);
+			calcZeroFlag(data);
+			x = data;
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+
+			cycleOffset = pageBoundaryCrossed ? 1 : 0;
+			break;
+
+		case LDY:
+			data = getInstructionData(operation, addressingMode);
+
+			calcSignFlag(data);
+			calcZeroFlag(data);
+			y = data;
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+
+			cycleOffset = pageBoundaryCrossed ? 1 : 0;
+			break;
+
+		case LSR:
+			data = getInstructionData(operation, addressingMode);
+
+			setCarryFlag((data & 0x01) != 0);
+			data >>= 1;
+			// Reduce to 1-byte data
+			data &= 0xFF;
+			calcZeroFlag(data);
+			setSignFlag(false);
+			if (addressingMode == AddressingMode.ACCUMULATOR) {
+				a = data;
+			} else {
+				mmc.writeCPUMem(address, data);
+			}
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case NOP:
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case ORA:
+			data = getInstructionData(operation, addressingMode);
+
+			temp = (short) (data | a);
+			calcZeroFlag(temp);
+			calcSignFlag(temp);
+			a = temp;
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+
+			cycleOffset = pageBoundaryCrossed ? 1 : 0;
+			break;
+
+		case PHA:
+			push(a);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case PHP:
+			push(flags);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case PLA:
+			a = pop();
+			/*
+			 * Note: VICE sets these flags, but that functionality isn't in the
+			 * documentation. What's the right thing to do? Do it their way for
+			 * now.
+			 */
+			calcSignFlag(a);
+			calcZeroFlag(a);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case PLP:
+			flags = pop();
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case ROL:
+			data = getInstructionData(operation, addressingMode);
+
+			boolean carry = (data & 0x80) != 0 ? true : false;
+			data <<= 1;
+			data &= 0xFF;
+
+			if (isCarryFlagSet())
+				data |= 0x01;
+
+			setCarryFlag(carry);
+			calcZeroFlag(data);
+			calcSignFlag(data);
+
+			if (addressingMode == AddressingMode.ACCUMULATOR)
+				a = data;
+			else
+				mmc.writeCPUMem(address, data);
+
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case ROR:
+			data = getInstructionData(operation, addressingMode);
+
+			carry = (data & 0x01) != 0 ? true : false;
+			data >>= 1;
+			data &= 0xFF;
+
+			if (isCarryFlagSet())
+				data |= 0x80;
+
+			setCarryFlag(carry);
+			calcZeroFlag(data);
+			calcSignFlag(data);
+
+			if (addressingMode == AddressingMode.ACCUMULATOR)
+				a = data;
+			else
+				mmc.writeCPUMem(address, data);
+
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case RTI:
+			flags = pop();
+			// Pop low byte first
+			data = (short) (pop() & 0xFF);
+			data |= (pop() << 8);
+			pc = data;
+			break;
+
+		case RTS:
+			// Pop low byte first
+			data = (short) (pop() & 0xFF);
+			data |= (pop() << 8);
+			pc = data + 1;
+			break;
+
+		case SBC:
+			data = getInstructionData(operation, addressingMode);
+
+			temp = (short) (a - data - (isCarryFlagSet() ? 1 : 0));
+			calcZeroFlag(temp);
+			calcSignFlag(temp);
+
+			/*
+			 * Note, most of the following logic comes directly from the VICE
+			 * emulator. Need to understand it better.
+			 */
+			setOverflowFlag((((a ^ data) & 0x80) != 0) && (((a ^ temp) & 0x80) != 0));
+
+			if (isDecimalFlagSet()) {
+				if (((a & 0x0F) - (isCarryFlagSet() ? 0 : 1)) < (data & 0x0F))
+					temp -= 6;
+
+				if (temp > 0x99)
+					temp -= 0x60;
+			}
+
+			setCarryFlag(temp < 0x100);
+
+			a = (short) (temp & 0xFF);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+
+			cycleOffset = pageBoundaryCrossed ? 1 : 0;
+			break;
+
+		case SEC:
+			setCarryFlag(true);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case SED:
+			setDecimalFlag(true);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case SEI:
+			setInterruptFlag(true);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case STA:
+			mmc.writeCPUMem(address, a);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case STX:
+			mmc.writeCPUMem(address, x);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case STY:
+			mmc.writeCPUMem(address, y);
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case TAX:
+			calcSignFlag(a);
+			calcZeroFlag(a);
+			x = a;
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case TAY:
+			calcSignFlag(a);
+			calcZeroFlag(a);
+			y = a;
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case TSX:
+			calcSignFlag(sp);
+			calcZeroFlag(sp);
+			x = sp;
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case TXA:
+			calcSignFlag(x);
+			calcZeroFlag(x);
+			a = x;
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case TXS:
+			sp = x;
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
+		case TYA:
+			calcSignFlag(y);
+			calcZeroFlag(y);
+			a = y;
+			pc += cpuTables.ByteCounts.get(operation).get(addressingMode);
+			break;
+
 		}
 
 		try {
