@@ -10,6 +10,7 @@ import java.util.List;
 public class ROMFile extends File {
 
 	private static final long serialVersionUID = 1L;
+	private Debugger debugger = Debugger.getInstance();
 	private int prgPageCount = 0, chrPageCount = 0;
 	private int romControl1 = 0, romControl2 = 0;
 	private int mapper = 0;
@@ -55,11 +56,24 @@ public class ROMFile extends File {
 			reader.close();
 
 		} catch (FileNotFoundException e) {
-			System.out.println("Error opening ROM file: " + pathname);
-			System.out.println(e.getMessage());
+			debugger.debugPrint("Error opening ROM file: " + pathname);
+			debugger.debugPrint(e.getMessage());
+			debugger.readCommands();
 		} catch (IOException ioe) {
-			System.out.println("Error reading ROM file: " + pathname);
-			System.out.println(ioe.getMessage());
+			debugger.debugPrint("Error reading ROM file: " + pathname);
+			debugger.debugPrint(ioe.getMessage());
+			debugger.readCommands();
+		}
+
+		debugger.debugPrint(String.format("\nPRG-ROM Pages: %d", prgPageCount));
+		debugger.debugPrint(String.format("\nCHR-ROM Pages: %d", chrPageCount));
+		debugger.debugPrint(String.format("\nROM Control Byte #1: %s", Debugger.intToHex(romControl1)));
+		debugger.debugPrint(String.format("\nROM Control Byte #2: %s", Debugger.intToHex(romControl2)));
+		debugger.debugPrint(String.format("\nMapper: %d", mapper));
+		if (mirroring == 2) {
+			debugger.debugPrint("\nMirroring: Four Screen");
+		} else {
+			debugger.debugPrint(String.format("\nMirroring: %s", mirroring == 0 ? "Horizontal" : "Vertical"));
 		}
 
 	}
