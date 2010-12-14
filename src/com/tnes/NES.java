@@ -15,6 +15,8 @@ public class NES {
 	public NES() {
 		romFile = null;
 		poweredOn = false;
+		
+		addDebugCommands();
 	}
 	
 	public boolean isPoweredOn() {
@@ -130,5 +132,41 @@ public class NES {
 			return list.subList((list.size() / 2), list.size() - 1);
 		
 		return null;
+	}
+	
+	/*
+	 * Debug commands
+	 */
+	private void addDebugCommands() {
+		try {
+			debugger.addCommand("loadROM", NES.class.getMethod("__loadROM", String.class), this);
+			debugger.addCommand("powerOn", NES.class.getMethod("__powerOn", String.class), this);
+			debugger.addCommand("reset", NES.class.getMethod("__reset", String.class), this);
+			debugger.addCommand("stopDebugging", NES.class.getMethod("__stopDebugging", String.class), this);
+			debugger.addCommand("quit", NES.class.getMethod("__quit", String.class), this);
+
+		} catch (NoSuchMethodException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public void __loadROM(String param) {
+		loadROM(param);
+	}
+	
+	public void __powerOn(String param) {
+		powerOn();
+	}
+	
+	public void __reset(String param) {
+		cpu.reset();
+	}
+	
+	public void __stopDebugging(String param) {
+		debugger.setDebugging(false);
+	}
+	
+	public void __quit(String param) {
+		System.exit(0);
 	}
 }

@@ -107,10 +107,12 @@ public class Debugger {
 				for (String key : commands.keySet()) {
 					buffer.append(key).append("\n");
 				}
+				System.out.println(buffer.toString());
 				result = true;
 			} else if (commandLine != null && !commandLine.isEmpty()) {
-				String command = commandLine.split(" ")[0];
-				String param = commandLine.split(" ")[1];
+				String[] commandPieces = commandLine.split(" ");
+				String command = commandPieces[0];
+				String param = (commandPieces.length > 1) ? commandPieces[1] : "";
 				execCommand(command, param);
 				result = true;
 			}

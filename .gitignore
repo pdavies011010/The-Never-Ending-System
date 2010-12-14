@@ -1,5 +1,5 @@
 *.nes
-*.log
+*.log*
 # Stuff that pdavies uses
 EMUTools/
 FCEUx/
