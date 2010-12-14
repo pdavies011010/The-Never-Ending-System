@@ -1,6 +1,7 @@
 package com.tnes;
 
 public class PPU {
+	private Debugger debugger = Debugger.getInstance();
 	private MMC mmc;
 	private short nameTableMirroring;
 	private short controlReg1, controlReg2, status;
@@ -11,9 +12,33 @@ public class PPU {
 	private int elapsedCycles;
 	private short backgroundColor;
 	private boolean frameComplete;
+	private boolean logPPUState;
 
 	public PPU(MMC mmc) {
 		this.mmc = mmc;
+		
+		controlReg1 = 0;
+		controlReg2 = 0x18;
+		// TODO: Correct init value?
+		status = 0;
+		spriteMemAddr = 0;
+		nameTableMirroring = 0;
+		// TODO: Correct init value?
+		verticalScrollReg = 0;
+		// TODO: Correct init value?
+		horizontalScrollReg = 0;
+		ppuMemAddr = 0;
+		
+		elapsedCycles = 0;
+		scanline = 0;
+		
+		logPPUState = false;
+		
+		// Palette black
+		backgroundColor = 0x0F;
+		
+		// Frame complete flag must be reset from outside this class
+		frameComplete = false;
 	}
 
 	public MMC getMMC() {
@@ -103,10 +128,18 @@ public class PPU {
 	public boolean isFrameComplete() {
 		return frameComplete;
 	}
+	
+	public void setFrameComplete(boolean frameComplete) {
+		this.frameComplete = frameComplete;
+	}
 
 	public boolean isVerticalRWFlagSet() {
 		// Vertical Read: PPU Address increments by 32 on read or write
-		return ((controlReg1 & Constants.PPU_CTRL_1_VERTICAL_WRITE) != 0) ? true : false;
+		return ((controlReg1 & Constants.PPU_CTRL_1_VERTICAL_WRITE) != 0);
+	}
+	
+	public boolean isVBlankEnableFlagSet() {
+		return ((controlReg1 & Constants.PPU_CTRL_1_VBLANK_ENABLE) != 0);
 	}
 
 	public short getBackgroundColorBits() {
@@ -114,9 +147,86 @@ public class PPU {
 		return result;
 	}
 
-	public void set_background_color_bits(short value) {
+	public void setBackgroundColorBits(short value) {
 		controlReg2 &= ~Constants.PPU_CTRL_2_BKG_COLOR_MASK;
 		controlReg2 |= (value << (short) 5);
+	}
+	
+	public void setHitFlag(boolean hitFlag) {
+		if (hitFlag)
+			status |= Constants.PPU_STAT_HIT;
+		else 
+			status &= ~Constants.PPU_STAT_HIT;
+	}
+	
+	public void setVBlankFlag(boolean vblankFlag) {
+		if (vblankFlag)
+			status |= Constants.PPU_STAT_VBLANK;
+		else 
+			status &= ~Constants.PPU_STAT_VBLANK;
+	}
+	
+	/*
+	 * PPU Logic
+	 */
+	public void execute(int cycles) {
+		boolean vblankHit = false;
+		int preVBlankCycles = 0;
+		
+		for (int cycle = 1; cycle < cycles; cycle++) {
+			// What scanline are we on?
+			scanline = (short) ((cycle + elapsedCycles) / Constants.SCANLINE_CYCLES);
+			int scanlineCycle = ((cycle + elapsedCycles) % Constants.SCANLINE_CYCLES);
+			int tilePixel = scanlineCycle % 8;
+			
+			if (scanline < 20) {
+				// Do nothing for first 20 scanlines
+			} else if (scanline == 20) {
+				
+			} else if (scanline < 261) {
+				
+			} else if (scanline == 261) {
+				// Again, do nothing
+			} else {
+				// Frame complete
+				vblankHit = true;
+				elapsedCycles = 0;
+				preVBlankCycles = cycle;
+				
+				postFrame();
+			}
+		}
+		
+		if (vblankHit) {
+			elapsedCycles = cycles - preVBlankCycles;
+		} else {
+			elapsedCycles += cycles;
+		}
+	}
+	
+	public void preFrame() {
+		/*
+		 * Fill the screen with the background color
+		 * fillScreenWithBackgroundColor();
+		 */
+		
+		// Clear Sprite #0 hit flag
+		setHitFlag(false);
+	}
+	
+	public void postFrame() {
+		// Raise the VBlank flag, NMI will be triggered
+		setVBlankFlag(true);
+		
+		// debugger.debugPrint("\nVBlank.");
+		if (logPPUState)
+			debugger.debugLog("\nVBlank");
+		
+		// Force CPU Non-maskable interrupt
+		if (isVBlankEnableFlagSet())
+			mmc.getCPU().NMI();
+		
+		frameComplete = true;
 	}
 
 	public void updateBackgroundColor() {

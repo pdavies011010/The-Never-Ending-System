@@ -76,48 +76,96 @@ public class MMC {
 		return cartridgeBankLo;
 	}
 
+	public void setCartridgetBankLo(short[] cartridgeBank) {
+		this.cartridgeBankLo = cartridgeBank;
+	}
+
 	public short[] getCartridgeBankHi() {
 		return cartridgeBankHi;
+	}
+
+	public void setCartridgeBankHi(short[] cartridgeBank) {
+		this.cartridgeBankHi = cartridgeBank;
 	}
 
 	public short[] getPatternTable0() {
 		return patternTable0;
 	}
 
+	public void setPatternTable0(short[] patternTable) {
+		this.patternTable0 = patternTable;
+	}
+
 	public short[] getPatternTable1() {
 		return patternTable1;
+	}
+
+	public void setPatternTable1(short[] patternTable) {
+		this.patternTable1 = patternTable;
 	}
 
 	public short[] getNameTable0() {
 		return nameTable0;
 	}
 
+	public void setNameTable0(short[] nameTable) {
+		this.nameTable0 = nameTable;
+	}
+
 	public short[] getAttributeTable0() {
 		return attributeTable0;
+	}
+
+	public void setAttributeTable0(short[] attributeTable) {
+		this.attributeTable0 = attributeTable;
 	}
 
 	public short[] getNameTable1() {
 		return nameTable1;
 	}
 
+	public void setNameTable1(short[] nameTable) {
+		this.nameTable1 = nameTable;
+	}
+
 	public short[] getAttributeTable1() {
 		return attributeTable1;
+	}
+
+	public void setAttributeTable1(short[] attributeTable) {
+		this.attributeTable1 = attributeTable;
 	}
 
 	public short[] getNameTable2() {
 		return nameTable2;
 	}
 
+	public void setNameTable2(short[] nameTable) {
+		this.nameTable2 = nameTable;
+	}
+
 	public short[] getAttributeTable2() {
 		return attributeTable2;
+	}
+
+	public void setAttributeTable2(short[] attributeTable) {
+		this.attributeTable2 = attributeTable;
 	}
 
 	public short[] getNameTable3() {
 		return nameTable3;
 	}
 
+	public void setNameTable3(short[] nameTable) {
+		this.nameTable3 = nameTable;
+	}
+
 	public short[] getAttributeTable3() {
 		return attributeTable3;
+	}
+
+	public void setAttributeTable3(short[] attributeTable) {
+		this.attributeTable3 = attributeTable;
 	}
 
 	public short[] getImagePalette() {
