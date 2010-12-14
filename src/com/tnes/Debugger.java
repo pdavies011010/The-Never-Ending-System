@@ -10,8 +10,11 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -68,7 +71,7 @@ public class Debugger {
 
 	public void debugPrint(String text) {
 		if (debugging) {
-			System.out.println(text);
+			System.out.print(text);
 		}
 	}
 
@@ -96,7 +99,7 @@ public class Debugger {
 		if (!debugging)
 			return result;
 
-		System.out.println("\nCommand>>");
+		System.out.print("\nCommand>>");
 		InputStreamReader converter = new InputStreamReader(System.in);
 		BufferedReader reader = new BufferedReader(converter);
 		try {
@@ -104,7 +107,9 @@ public class Debugger {
 			if ("?".equals(commandLine)) {
 				System.out.println("Commands: ");
 				StringBuffer buffer = new StringBuffer("");
-				for (String key : commands.keySet()) {
+				List<String> keys = new ArrayList<String>(commands.keySet());
+				Collections.sort(keys);
+				for (String key : keys) {
 					buffer.append(key).append("\n");
 				}
 				System.out.println(buffer.toString());
