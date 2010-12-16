@@ -816,7 +816,7 @@ public class CPU {
 			// Error occurred, stack overflow
 			debugger.debugPrint("\nStack Overflow Occurred");
 			debugger.debugLog("\nStack Overflow Occurred");
-			// debugger.debugGetCommands();
+			debugger.readCommands();
 		}
 	}
 
@@ -829,7 +829,7 @@ public class CPU {
 			// Error occurred, stack underflow
 			debugger.debugPrint("\nStack Underflow Occurred");
 			debugger.debugLog("\nStack Underflow Occurred");
-			// debugger.debugGetCommands();
+			debugger.readCommands();
 		}
 
 		return result;
@@ -1113,7 +1113,7 @@ public class CPU {
 		int address = Integer.parseInt(param.split(",")[0]);
 		short data = Byte.parseByte(param.split(",")[1]);
 
-		debugger.debugPrint(String.format("\nOperation: %s  Addressing Mode: %s  Address: %s  Data: %s", operation.toString(), addressingMode.toString(), address, data));
+		debugger.debugPrint(String.format("\nOperation: %s  Addressing Mode: %s  Address: %s  Data: %s", operation.toString(), addressingMode.toString(), Debugger.intToHex(address), Debugger.shortToHex(data)));
 		debugger.debugPrint(String.format("\nPC: %s  SP: %s  A: %s  X: %s  Y: %s", Debugger.intToHex(pc), Debugger.shortToHex(sp), Debugger.shortToHex(a), Debugger.shortToHex(x), Debugger.shortToHex(y)));
 		debugger.debugPrint(String.format("\nStatus: S-%d  V-%d  B-%d  D-%d  I-%d  Z-%d  C-%d", isSignFlagSet() ? 1 : 0, isOverflowFlagSet() ? 1 : 0, isBreakFlagSet() ? 1 : 0, isDecimalFlagSet() ? 1 : 0, isInterruptFlagSet() ? 1 : 0, isZeroFlagSet() ? 1 : 0, isCarryFlagSet() ? 1 : 0));
 	}
@@ -1130,7 +1130,7 @@ public class CPU {
 		int address = Integer.parseInt(param.split(",")[0]);
 		short data = Byte.parseByte(param.split(",")[1]);
 
-		debugger.debugLog(String.format("\nOperation: %s  Addressing Mode: %s  Address: %s  Data: %s", operation.toString(), addressingMode.toString(), address, data));
+		debugger.debugLog(String.format("\nOperation: %s  Addressing Mode: %s  Address: %s  Data: %s", operation.toString(), addressingMode.toString(), Debugger.intToHex(address), Debugger.shortToHex(data)));
 		debugger.debugLog(String.format("\nPC: %s  SP: %s  A: %s  X: %s  Y: %s", Debugger.intToHex(pc), Debugger.shortToHex(sp), Debugger.shortToHex(a), Debugger.shortToHex(x), Debugger.shortToHex(y)));
 		debugger.debugLog(String.format("\nStatus: S-%d  V-%d  B-%d  D-%d  I-%d  Z-%d  C-%d", isSignFlagSet() ? 1 : 0, isOverflowFlagSet() ? 1 : 0, isBreakFlagSet() ? 1 : 0, isDecimalFlagSet() ? 1 : 0, isInterruptFlagSet() ? 1 : 0, isZeroFlagSet() ? 1 : 0, isCarryFlagSet() ? 1 : 0));
 	}

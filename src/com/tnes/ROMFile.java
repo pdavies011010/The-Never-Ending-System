@@ -33,6 +33,10 @@ public class ROMFile extends File {
 			mirroring |= (romControl1 & 0x08) >> 2;
 			mirroring = (mirroring == 0) ? (romControl1 & 0x01) : mirroring;
 
+			// Read in remaining 8 header bytes and discard
+			byte[] remaining = new byte[8];
+			stream.read(remaining, 0, 8);
+			
 			// Load PRG-ROM and CHR-Pages into object variables
 			prgROMPages = new ArrayList<List<Short>>(prgPageCount);
 			chrROMPages = new ArrayList<List<Short>>(chrPageCount);
