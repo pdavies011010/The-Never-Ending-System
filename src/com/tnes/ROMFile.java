@@ -1,8 +1,8 @@
 package com.tnes;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +22,13 @@ public class ROMFile extends File {
 		super(pathname);
 
 		try {
-			FileReader reader = new FileReader(this);
-			char[] fileType = new char[4];
-			reader.read(fileType, 0, 4);
-			prgPageCount = reader.read();
-			chrPageCount = reader.read();
-			romControl1 = reader.read();
-			romControl2 = reader.read();
+			FileInputStream stream = new FileInputStream(this);
+			byte[] fileType = new byte[4];
+			stream.read(fileType, 0, 4);
+			prgPageCount = stream.read();
+			chrPageCount = stream.read();
+			romControl1 = stream.read();
+			romControl2 = stream.read();
 			mapper = (romControl1 >> 4) | romControl2;
 			mirroring |= (romControl1 & 0x08) >> 2;
 			mirroring = (mirroring == 0) ? (romControl1 & 0x01) : mirroring;
@@ -41,7 +41,10 @@ public class ROMFile extends File {
 			for (int i = 0; i < prgPageCount; i++) {
 				prgROMPages.add(i, new ArrayList<Short>(Constants.PRG_ROM_PAGE_SIZE));
 				for (int j = 0; j < Constants.PRG_ROM_PAGE_SIZE; j++) {
-					prgROMPages.get(i).add(j, (short) reader.read());
+					prgROMPages.get(i).add(j, (short) stream.read());
+					
+					if (prgROMPages.get(i).get(j) > 0xFF)
+						debugger.debugPrint("\nChar Value over 0xFF: " + prgROMPages.get(i).get(j));
 				}
 			}
 
@@ -49,11 +52,11 @@ public class ROMFile extends File {
 			for (int i = 0; i < chrPageCount; i++) {
 				chrROMPages.add(i, new ArrayList<Short>(Constants.CHR_ROM_PAGE_SIZE));
 				for (int j = 0; j < Constants.CHR_ROM_PAGE_SIZE; j++) {
-					chrROMPages.get(i).add(j, (short) reader.read());
+					chrROMPages.get(i).add(j, (short) stream.read());
 				}
 			}
 
-			reader.close();
+			stream.close();
 
 		} catch (FileNotFoundException e) {
 			debugger.debugPrint("Error opening ROM file: " + pathname);
