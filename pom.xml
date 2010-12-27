@@ -3,5 +3,24 @@
   <groupId>com.tnes</groupId>
   <artifactId>tnes</artifactId>
   <name>The-Never-Ending-System</name>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
+  	<build>
+  		<plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+             </plugin>
+         </plugins>
+      </build>
+	<dependencies>
+    	<dependency>
+        	<groupId>org.processing</groupId>
+        	<artifactId>processing-core</artifactId>
+        	<version>1.2.1</version>
+        </dependency>
+	</dependencies>
 </project>

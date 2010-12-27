@@ -8,4 +8,5 @@ smb/
 classes/
 bin/
 lib/
+target/
 nestech.txt
