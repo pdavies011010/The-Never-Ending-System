@@ -1,5 +1,7 @@
 package com.tnes;
 
+import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,14 +13,17 @@ public class NES {
 	private String romFilePath;
 	private ROMFile romFile;
 	private boolean poweredOn = false;
+	private List<INESHandler> eventHandlers;
 
 	public NES() {
 		romFile = null;
 		poweredOn = false;
-		
+
+		eventHandlers = new ArrayList<INESHandler>();
+
 		addDebugCommands();
 	}
-	
+
 	public boolean isPoweredOn() {
 		return poweredOn;
 	}
@@ -28,6 +33,16 @@ public class NES {
 	 */
 	public void loadROM(String romFilePath) {
 		this.romFilePath = romFilePath;
+
+		// Raise a power on event
+		raiseEvent(IROMLoadHandler.class, new ROMLoadEvent(this, romFilePath));
+	}
+
+	public void reset() {
+		cpu.reset();
+
+		// Raise a reset event
+		raiseEvent(IResetHandler.class, new ResetEvent(this));
 	}
 
 	public void powerOn() {
@@ -106,34 +121,71 @@ public class NES {
 		// Rest the CPU
 		cpu.reset();
 
+		poweredOn = true;
+
+		// Raise a power on event
+		raiseEvent(IPowerOnHandler.class, new PowerOnEvent(this));
+
 		// Get debug commands if debugging is enabled
 		debugger.readCommands();
+		
+		execute();
+	}
 
-		poweredOn = true;
+	public void execute() {
+		while (poweredOn) {
+			runOneFrame();
+		}
 	}
 	
-	public void runOneFrame() {
+	private void runOneFrame() {
 		ppu.preFrame();
-		
+
 		while (!ppu.isFrameComplete()) {
 			int cycles = cpu.execute();
-			
+
 			// CPU CC = PPU CC / 3
 			ppu.execute(cycles * 3);
 		}
-		
+
 		ppu.setFrameComplete(false);
+
+		// Raise a frame complete event
+		raiseEvent(IFrameCompleteHandler.class, new FrameCompleteEvent(this));
 	}
-	
+
 	private List<Short> splitList(List<Short> list, int index) {
 		if (index == 0)
 			return list.subList(0, ((list.size() / 2) - 1));
-		else if (index == 1) 
+		else if (index == 1)
 			return list.subList((list.size() / 2), list.size() - 1);
-		
+
 		return null;
 	}
-	
+
+	/*
+	 * Manage Event Handlers
+	 */
+	public void addHandler(INESHandler eventHandler) {
+		this.eventHandlers.add(eventHandler);
+	}
+
+	public void removeHandler(INESHandler eventHandler) {
+		this.eventHandlers.remove(eventHandler);
+	}
+
+	public void removeAllHandlers() {
+		this.eventHandlers.clear();
+	}
+
+	public void raiseEvent(Class<?> handlerClass, NESEvent event) {
+		for (INESHandler eventHandler : eventHandlers) {
+			if (eventHandler.getClass().equals(handlerClass)) {
+				eventHandler.handleEvent(event);
+			}
+		}
+	}
+
 	/*
 	 * Debug commands
 	 */
@@ -149,24 +201,89 @@ public class NES {
 			System.out.println(e.getMessage());
 		}
 	}
-	
+
 	public void __loadROM(String param) {
 		loadROM(param);
 	}
-	
+
 	public void __powerOn(String param) {
 		powerOn();
 	}
-	
+
 	public void __reset(String param) {
 		cpu.reset();
 	}
-	
+
 	public void __stopDebugging(String param) {
 		debugger.setDebugging(false);
 	}
-	
+
 	public void __quit(String param) {
 		System.exit(0);
+	}
+
+	/*
+	 * Events / interfaces for event handling
+	 */
+	protected interface INESHandler {
+		public void handleEvent(NESEvent e);
+	}
+
+	public interface IROMLoadHandler extends INESHandler {
+	}
+
+	public interface IResetHandler extends INESHandler {
+	}
+
+	public interface IPowerOnHandler extends INESHandler {
+	}
+
+	public interface IFrameCompleteHandler extends INESHandler {
+	}
+
+	protected class NESEvent extends EventObject {
+		private static final long serialVersionUID = 1L;
+
+		public NESEvent(Object source) {
+			super(source);
+		}
+	}
+
+	public class ROMLoadEvent extends NESEvent {
+		private static final long serialVersionUID = 1L;
+		private String romFile;
+
+		public ROMLoadEvent(Object source, String romFile) {
+			super(source);
+			this.romFile = romFile;
+		}
+
+		public String getROMFile() {
+			return romFile;
+		}
+	}
+
+	public class ResetEvent extends NESEvent {
+		private static final long serialVersionUID = 1L;
+
+		public ResetEvent(Object source) {
+			super(source);
+		}
+	}
+
+	public class PowerOnEvent extends NESEvent {
+		private static final long serialVersionUID = 1L;
+
+		public PowerOnEvent(Object source) {
+			super(source);
+		}
+	}
+
+	public class FrameCompleteEvent extends NESEvent {
+		private static final long serialVersionUID = 1L;
+
+		public FrameCompleteEvent(Object source) {
+			super(source);
+		}
 	}
 }

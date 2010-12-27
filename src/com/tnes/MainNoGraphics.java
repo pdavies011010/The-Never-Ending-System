@@ -21,11 +21,6 @@ public class MainNoGraphics {
 		if (!romFile.isEmpty()) {
 			nes.loadROM(romFile);
 			nes.powerOn();
-			
-			// Loop and run PPU frames
-			while (true) {
-				nes.runOneFrame();
-			}
 		} else {
 			System.out.println(String.format("ROM File passed in as: '%s'", romFile));
 			debugger.readCommands();
