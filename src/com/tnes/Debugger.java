@@ -154,11 +154,11 @@ public class Debugger {
 	 * Static utility methods
 	 */
 	public static String intToHex(int value) {
-		return String.format("%x", value);
+		return String.format("%x", value).toUpperCase();
 	}
 
 	public static String shortToHex(short value) {
-		return String.format("%x", value);
+		return String.format("%x", value).toUpperCase();
 	}
 
 	public static int hexToInt(String value) {
