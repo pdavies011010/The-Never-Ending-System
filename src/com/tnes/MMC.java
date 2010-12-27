@@ -418,15 +418,15 @@ public class MMC {
 				ppuMemAddressRegSwitch = (!ppuMemAddressRegSwitch);
 			} else if (trueAddress == Constants.PPU_MEM_DATA_PORT) {
 				writePPUMem(ppu.getPPUMemAddr(), value);
-				debugger.debugPrint(String.format("\nWriting %s to PPU address %s", Debugger.shortToHex(value), Debugger.intToHex(ppu.getPPUMemAddr())));
 				if (ppu.isVerticalRWFlagSet())
 					ppu.setPPUMemAddr(ppu.getPPUMemAddr() + 32);
 				else
 					ppu.setPPUMemAddr(ppu.getPPUMemAddr() + 1);
 			} else if (trueAddress == Constants.PPU_SPRITE_DMA_PORT) {
-				// Sprite RAM DMA - Transfer 256 shorts of data from CPU mem to
-				// Sprite RAM
-				// from location at (0x100 * value)
+				/*
+				 * Sprite RAM DMA - Transfer 256 shorts of data from CPU mem to
+				 * Sprite RAM from location at (0x100 value)
+				 */
 				int startAddress = value * 0x100;
 				int endAddress = startAddress + 0x100;
 				for (int i = startAddress; i < endAddress; i++) {

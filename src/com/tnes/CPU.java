@@ -896,7 +896,7 @@ public class CPU {
 	}
 
 	private void calcSignFlag(short val) {
-		setSignFlag((val & 80) != 0);
+		setSignFlag((val & 0x80) != 0);
 	}
 
 	private void calcZeroFlag(short val) {

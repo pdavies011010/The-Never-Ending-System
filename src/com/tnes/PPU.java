@@ -59,7 +59,7 @@ public class PPU {
 
 		// Frame complete flag must be reset from outside this class
 		frameComplete = false;
-		
+
 		addDebugCommands();
 	}
 
@@ -326,7 +326,7 @@ public class PPU {
 		boolean vblankHit = false;
 		int preVBlankCycles = 0;
 
-		for (int cycle = 1; cycle < cycles; cycle++) {
+		for (int cycle = 1; cycle <= cycles; cycle++) {
 			// What scanline are we on?
 			scanline = (short) ((cycle + elapsedCycles) / Constants.SCANLINE_CYCLES);
 			int scanlineCycle = ((cycle + elapsedCycles) % Constants.SCANLINE_CYCLES);
@@ -397,7 +397,7 @@ public class PPU {
 							// Draw left 8 pixels of screen...
 							screenBuffer[trueScanline][scanlineCycle] = mmc.readPPUMem(Constants.IMAGE_PALETTE_LO + paletteIndex);
 						}
-					} else {
+					} else if (scanlineCycle < 256) {
 						screenBuffer[trueScanline][scanlineCycle] = mmc.readPPUMem(Constants.IMAGE_PALETTE_LO + paletteIndex);
 					}
 				}
@@ -405,7 +405,7 @@ public class PPU {
 				// Draw sprites
 				paletteIndex = 0;
 				if (isSpriteEnableFlagSet()) {
-					if (applicableSprites != null) {
+					if (applicableSprites != null && !applicableSprites.isEmpty()) {
 						/*
 						 * TODO: Just dealing with 1 sprite for now (need to put
 						 * in logic for multiple sprites, collisions, etc) TODO:
@@ -429,7 +429,7 @@ public class PPU {
 									// Color #0 is transparent
 									screenBuffer[trueScanline][scanlineCycle] = mmc.readPPUMem(Constants.SPRITE_PALETTE_LO + paletteIndex);
 								}
-							} else if (paletteIndex != 0) {
+							} else if (scanlineCycle < 256 && paletteIndex != 0) {
 								// Color #0 is transparent
 								screenBuffer[trueScanline][scanlineCycle] = mmc.readPPUMem(Constants.SPRITE_PALETTE_LO + paletteIndex);
 							}
@@ -444,7 +444,6 @@ public class PPU {
 				vblankHit = true;
 				elapsedCycles = 0;
 				preVBlankCycles = cycle;
-
 				postFrame();
 			}
 		}
