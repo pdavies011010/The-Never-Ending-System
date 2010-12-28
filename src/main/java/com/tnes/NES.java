@@ -2,24 +2,25 @@ package com.tnes;
 
 import java.util.ArrayList;
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class NES {
 	private Debugger debugger = Debugger.getInstance();
 	private MMC mmc;
 	private CPU cpu;
 	private PPU ppu;
-	private String romFilePath;
 	private ROMFile romFile;
 	private boolean poweredOn = false;
-	private List<INESHandler> eventHandlers;
+	private Map<Class<? extends NESEvent>, List<INESHandler>> eventHandlers;
 
 	public NES() {
 		romFile = null;
 		poweredOn = false;
 
-		eventHandlers = new ArrayList<INESHandler>();
+		eventHandlers = new HashMap<Class<? extends NESEvent>, List<INESHandler>>();
 
 		addDebugCommands();
 	}
@@ -28,24 +29,32 @@ public class NES {
 		return poweredOn;
 	}
 
+	public ROMFile getROMFile() {
+		return romFile;
+	}
+
 	/*
 	 * NES logic
 	 */
 	public void loadROM(String romFilePath) {
-		this.romFilePath = romFilePath;
+		// Load up ROM
+		romFile = new ROMFile(romFilePath);
 
 		// Raise a power on event
-		raiseEvent(IROMLoadHandler.class, new ROMLoadEvent(this, romFilePath));
+		raiseEvent(new ROMLoadEvent(this, romFilePath));
 	}
 
 	public void reset() {
 		cpu.reset();
 
 		// Raise a reset event
-		raiseEvent(IResetHandler.class, new ResetEvent(this));
+		raiseEvent(new ResetEvent(this));
 	}
 
 	public void powerOn() {
+		if (romFile == null)
+			return;
+
 		mmc = new MMC();
 		cpu = new CPU(mmc);
 		ppu = new PPU(mmc);
@@ -56,9 +65,6 @@ public class NES {
 		 */
 		mmc.setCPU(cpu);
 		mmc.setPPU(ppu);
-
-		// Load up ROM
-		romFile = new ROMFile(romFilePath);
 
 		ppu.setNameTableMirroring((short) romFile.getMirroring());
 
@@ -124,7 +130,7 @@ public class NES {
 		poweredOn = true;
 
 		// Raise a power on event
-		raiseEvent(IPowerOnHandler.class, new PowerOnEvent(this));
+		raiseEvent(new PowerOnEvent(this));
 
 		// Get debug commands if debugging is enabled
 		debugger.readCommands();
@@ -136,7 +142,7 @@ public class NES {
 		poweredOn = false;
 
 		// Raise a power off event
-		raiseEvent(IPowerOffHandler.class, new PowerOffEvent(this));
+		raiseEvent(new PowerOffEvent(this));
 	}
 
 	public void execute() {
@@ -158,7 +164,7 @@ public class NES {
 		ppu.setFrameComplete(false);
 
 		// Raise a frame complete event
-		raiseEvent(IFrameCompleteHandler.class, new FrameCompleteEvent(this));
+		raiseEvent(new FrameCompleteEvent(this));
 	}
 
 	private List<Short> splitList(List<Short> list, int index) {
@@ -173,22 +179,28 @@ public class NES {
 	/*
 	 * Manage Event Handlers
 	 */
-	public void addHandler(INESHandler eventHandler) {
-		this.eventHandlers.add(eventHandler);
+	public void addHandler(Class<? extends NESEvent> eventClass, INESHandler eventHandler) {
+		if (this.eventHandlers.get(eventClass) == null)
+			this.eventHandlers.put(eventClass, new ArrayList<INESHandler>());
+
+		this.eventHandlers.get(eventClass).add(eventHandler);
 	}
 
-	public void removeHandler(INESHandler eventHandler) {
-		this.eventHandlers.remove(eventHandler);
+	public void removeHandler(Class<? extends NESEvent> eventClass, INESHandler eventHandler) {
+		if (this.eventHandlers.get(eventClass) != null) {
+			this.eventHandlers.get(eventClass).remove(eventHandler);
+		}
 	}
 
 	public void removeAllHandlers() {
 		this.eventHandlers.clear();
 	}
 
-	public void raiseEvent(Class<?> handlerClass, NESEvent event) {
-		for (INESHandler eventHandler : eventHandlers) {
-			if (eventHandler.getClass().equals(handlerClass)) {
-				eventHandler.handleEvent(event);
+	public void raiseEvent(NESEvent event) {
+		List<INESHandler> handlers = this.eventHandlers.get(event.getClass());
+		if (handlers != null && !handlers.isEmpty()) {
+			for (INESHandler handler : handlers) {
+				handler.handleEvent(event);
 			}
 		}
 	}

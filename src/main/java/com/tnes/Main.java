@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.util.ResourceBundle;
 
@@ -14,7 +16,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import com.tnes.NES.IPowerOffHandler;
+import com.tnes.NES.IPowerOnHandler;
+import com.tnes.NES.IROMLoadHandler;
 import com.tnes.NES.NESEvent;
+import com.tnes.NES.PowerOffEvent;
+import com.tnes.NES.PowerOnEvent;
+import com.tnes.NES.ROMLoadEvent;
 
 public class Main {
 	private static final long serialVersionUID = 1L;
@@ -23,6 +31,10 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
+		final NES nes = new NES();
+		final Debugger debugger = Debugger.getInstance();
+		boolean debugging = false;
+
 		final ResourceBundle resourceBundle = ResourceBundle.getBundle("tnes");
 		final JFrame window = new JFrame(resourceBundle.getString("com.tnes.windowTitle"));
 		final JMenuBar menuBar = new JMenuBar();
@@ -31,15 +43,26 @@ public class Main {
 		final JCheckBoxMenuItem power = new JCheckBoxMenuItem(resourceBundle.getString("com.tnes.menu.system.power"));
 		final JMenuItem reset = new JMenuItem(resourceBundle.getString("com.tnes.menu.system.reset"));
 
-		final NES nes = new NES();
-		final Debugger debugger = Debugger.getInstance();
-		boolean debugging = false;
-
 		/*
 		 * Build the window
 		 */
 		window.setSize(256, 321);
 		window.setVisible(true);
+
+		/*
+		 * Drop the user back into the debugger if the window is closed. TODO:
+		 * This doesn't ever seem to get called.
+		 */
+		window.addWindowStateListener(new WindowStateListener() {
+			public void windowStateChanged(WindowEvent e) {
+				if (e.getNewState() == WindowEvent.WINDOW_CLOSED) {
+					// Drop into the debugger, if debugging
+					debugger.readCommands();
+				}
+			}
+		});
+
+		// Build the menu bar
 		window.setJMenuBar(menuBar);
 
 		loadROM.addActionListener(new Main.NESAction() {
@@ -54,9 +77,7 @@ public class Main {
 					File romFile = fileChooser.getSelectedFile(); // Returns a
 					// Java File
 					String sROMFilePath = romFile.getAbsolutePath();
-					String sROMFile = romFile.getName();
 					if (sROMFilePath != null && !sROMFilePath.isEmpty()) {
-						window.setTitle(resourceBundle.getString("com.tnes.windowTitle") + ": " + sROMFile);
 						nes.loadROM(sROMFilePath);
 					}
 				}
@@ -68,23 +89,14 @@ public class Main {
 		power.addItemListener(new Main.NESToggleAction() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED)
+				if (e.getStateChange() == ItemEvent.SELECTED && !nes.isPoweredOn()) {
 					nes.powerOn();
-				else if (e.getStateChange() == ItemEvent.DESELECTED)
+				} else if (e.getStateChange() == ItemEvent.DESELECTED && nes.isPoweredOn()) {
 					nes.powerOff();
+				}
 			}
 		});
 		power.setText(resourceBundle.getString("com.tnes.menu.system.power"));
-		nes.addHandler(new NES.IPowerOnHandler() {
-			public void handleEvent(NESEvent e) {
-				power.setSelected(true);
-			}
-		});
-		nes.addHandler(new NES.IPowerOffHandler() {
-			public void handleEvent(NESEvent e) {
-				power.setSelected(false);
-			}
-		});
 
 		reset.addActionListener(new Main.NESAction() {
 			@Override
@@ -104,7 +116,32 @@ public class Main {
 		Screen screen = new Screen();
 		window.add(screen);
 
-		/* Read command line args */
+		/*
+		 * Add NES handlers
+		 */
+		nes.addHandler(PowerOnEvent.class, new IPowerOnHandler() {
+			public void handleEvent(NESEvent e) {
+				if (!power.isSelected())
+					power.setSelected(true);
+			}
+		});
+
+		nes.addHandler(PowerOffEvent.class, new IPowerOffHandler() {
+			public void handleEvent(NESEvent e) {
+				if (power.isSelected())
+					power.setSelected(false);
+			}
+		});
+
+		nes.addHandler(ROMLoadEvent.class, new IROMLoadHandler() {
+			public void handleEvent(NESEvent e) {
+				String romFile = nes.getROMFile().getName();
+				System.out.println(romFile);
+				window.setTitle(resourceBundle.getString("com.tnes.windowTitle") + ": " + romFile);
+			}
+		});
+
+		/* Read command line args and kick things off */
 		String romFile = "";
 		for (String arg : args) {
 			if (arg.matches("[^\\.]*\\.nes")) {
