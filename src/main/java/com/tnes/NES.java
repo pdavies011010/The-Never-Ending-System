@@ -128,8 +128,15 @@ public class NES {
 
 		// Get debug commands if debugging is enabled
 		debugger.readCommands();
-		
+
 		execute();
+	}
+
+	public void powerOff() {
+		poweredOn = false;
+
+		// Raise a power off event
+		raiseEvent(IPowerOffHandler.class, new PowerOffEvent(this));
 	}
 
 	public void execute() {
@@ -137,7 +144,7 @@ public class NES {
 			runOneFrame();
 		}
 	}
-	
+
 	private void runOneFrame() {
 		ppu.preFrame();
 
@@ -238,6 +245,9 @@ public class NES {
 	public interface IPowerOnHandler extends INESHandler {
 	}
 
+	public interface IPowerOffHandler extends INESHandler {
+	}
+
 	public interface IFrameCompleteHandler extends INESHandler {
 	}
 
@@ -275,6 +285,14 @@ public class NES {
 		private static final long serialVersionUID = 1L;
 
 		public PowerOnEvent(Object source) {
+			super(source);
+		}
+	}
+
+	public class PowerOffEvent extends NESEvent {
+		private static final long serialVersionUID = 1L;
+
+		public PowerOffEvent(Object source) {
 			super(source);
 		}
 	}
