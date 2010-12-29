@@ -1,1 +1,16 @@
 This is the official repository for the "Never Ending System" project.
+
+Included are eclipse project files as well as a maven POM.xml file. 
+
+In order for this to build you need to include the Processing core.jar file in your Maven repository with the following settings (from current POM.xml): 
+<dependency>
+<groupId>org.processing</groupId>
+<artifactId>processing-core</artifactId>
+<version>1.2.1</version>
+</dependency>
+
+Once the build is done the output will be 'target\tnes-<version>.jar' as well as 'target\lib\' which should be packaged together if you're going to distribute this. 
+
+To run it simply do a 'java -jar target\tnes-<version>.jar'. Optionally on the command line you can pass in the name of an NES ROM file to run (which will be loaded up and powered on immediately) as well as the following flags:
+
+-d or -D    -- Enable Debugging
