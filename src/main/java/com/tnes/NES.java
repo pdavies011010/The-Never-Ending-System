@@ -15,6 +15,7 @@ public class NES {
 	private ROMFile romFile;
 	private boolean poweredOn = false;
 	private Map<Class<? extends NESEvent>, List<INESHandler>> eventHandlers;
+	private MainThread mainThread = new MainThread();
 
 	public NES() {
 		romFile = null;
@@ -23,6 +24,8 @@ public class NES {
 		eventHandlers = new HashMap<Class<? extends NESEvent>, List<INESHandler>>();
 
 		addDebugCommands();
+
+		new Thread(mainThread).start();
 	}
 
 	public boolean isPoweredOn() {
@@ -127,15 +130,13 @@ public class NES {
 		// Rest the CPU
 		cpu.reset();
 
+		// Get debug commands if debugging is enabled
+		debugger.readCommands();
+
 		poweredOn = true;
 
 		// Raise a power on event
 		raiseEvent(new PowerOnEvent(this));
-
-		// Get debug commands if debugging is enabled
-		debugger.readCommands();
-
-		execute();
 	}
 
 	public void powerOff() {
@@ -143,12 +144,6 @@ public class NES {
 
 		// Raise a power off event
 		raiseEvent(new PowerOffEvent(this));
-	}
-
-	public void execute() {
-		while (poweredOn) {
-			runOneFrame();
-		}
 	}
 
 	private void runOneFrame() {
@@ -174,6 +169,24 @@ public class NES {
 			return list.subList((list.size() / 2), list.size() - 1);
 
 		return null;
+	}
+
+	/*
+	 * Runnable object
+	 */
+	public class MainThread implements Runnable {
+		public void run() {
+			while (true) {
+				if (poweredOn)
+					runOneFrame();
+				else {
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+		}
 	}
 
 	/*

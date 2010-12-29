@@ -25,6 +25,7 @@ public class Debugger {
 	private File logFile;
 	private Map<String, DebuggerCommand> commands = new HashMap<String, DebuggerCommand>();
 	private static Debugger debugger;
+	private boolean waitingForInput = false;
 
 	public static String LOG_FILE_NAME = "tnes.log";
 	public static String PARAM_DELIM = ",";
@@ -99,6 +100,7 @@ public class Debugger {
 		if (!debugging)
 			return result;
 
+		waitingForInput = true;
 		System.out.print("\nCommand>>");
 		InputStreamReader converter = new InputStreamReader(System.in);
 		BufferedReader reader = new BufferedReader(converter);
@@ -123,12 +125,17 @@ public class Debugger {
 			}
 		} catch (IOException e) {
 			debugPrint("Error reading from input.");
+		} finally {
+			waitingForInput = false;
 		}
 
 		return result;
 	}
 
 	public void readCommands() {
+		if (waitingForInput)
+			return;
+
 		boolean commandReceived = true;
 		while (commandReceived) {
 			commandReceived = readCommand();

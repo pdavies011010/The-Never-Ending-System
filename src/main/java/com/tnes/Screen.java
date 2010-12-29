@@ -34,11 +34,27 @@ public class Screen extends PApplet {
 	public Screen() {
 		super();
 	}
+	
+	public boolean isPaletteViewerShown() {
+	    return paletteViewerShown;
+    }
+
+	public void setPaletteViewerShown(boolean paletteViewerShown) {
+	    this.paletteViewerShown = paletteViewerShown;
+    }
+
+	public boolean isPatternTableViewerShown() {
+	    return patternTableViewerShown;
+    }
+
+	public void setPatternTableViewerShown(boolean patternTableViewerShown) {
+	    this.patternTableViewerShown = patternTableViewerShown;
+    }
 
 	@Override
 	public void setup() {
-		paletteViewerShown = false;
-		patternTableViewerShown = false;
+		setPaletteViewerShown(false);
+		setPatternTableViewerShown(false);
 
 		size(356, 300, "P2D");
 

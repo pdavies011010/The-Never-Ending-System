@@ -57,7 +57,11 @@ public class Main {
 			public void windowStateChanged(WindowEvent e) {
 				if (e.getNewState() == WindowEvent.WINDOW_CLOSED) {
 					// Drop into the debugger, if debugging
-					debugger.readCommands();
+					if (debugger.isDebugging()) {
+						debugger.readCommands();
+					} else {
+						System.exit(0);
+					}
 				}
 			}
 		});
@@ -74,10 +78,12 @@ public class Main {
 
 				int rVal = fileChooser.showOpenDialog(window);
 				if (rVal == JFileChooser.APPROVE_OPTION) {
-					File romFile = fileChooser.getSelectedFile(); // Returns a
-					// Java File
+					File romFile = fileChooser.getSelectedFile();
 					String sROMFilePath = romFile.getAbsolutePath();
 					if (sROMFilePath != null && !sROMFilePath.isEmpty()) {
+						if (nes.isPoweredOn())
+							nes.powerOff();
+
 						nes.loadROM(sROMFilePath);
 					}
 				}
@@ -121,8 +127,10 @@ public class Main {
 		 */
 		nes.addHandler(PowerOnEvent.class, new IPowerOnHandler() {
 			public void handleEvent(NESEvent e) {
-				if (!power.isSelected())
+				if (!power.isSelected()) {
 					power.setSelected(true);
+
+				}
 			}
 		});
 
@@ -136,7 +144,6 @@ public class Main {
 		nes.addHandler(ROMLoadEvent.class, new IROMLoadHandler() {
 			public void handleEvent(NESEvent e) {
 				String romFile = nes.getROMFile().getName();
-				System.out.println(romFile);
 				window.setTitle(resourceBundle.getString("com.tnes.windowTitle") + ": " + romFile);
 			}
 		});
@@ -156,9 +163,6 @@ public class Main {
 		if (!romFile.isEmpty()) {
 			nes.loadROM(romFile);
 			nes.powerOn();
-		} else {
-			System.out.println(String.format("ROM File passed in as: '%s'", romFile));
-			debugger.readCommands();
 		}
 	}
 
