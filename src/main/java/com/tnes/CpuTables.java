@@ -188,6 +188,7 @@ public class CpuTables {
 		Operations.put(Opcode.TSX, Operation.TSX);
 		Operations.put(Opcode.TXA, Operation.TXA);
 		Operations.put(Opcode.TXS, Operation.TXS);
+		Operations.put(Opcode.TYA, Operation.TYA);
 
 		/*
 		 * Build map of Opcode -> Addressing Mode
