@@ -1,5 +1,6 @@
 package com.tnes;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -48,6 +49,7 @@ public class Main {
 		 */
 		window.setSize(256, 321);
 		window.setVisible(true);
+		window.setLayout(new BorderLayout());
 
 		/*
 		 * Drop the user back into the debugger if the window is closed. TODO:
@@ -119,8 +121,9 @@ public class Main {
 		menuBar.add(system);
 
 		// Build Processing screen
-		Screen screen = new Screen();
-		window.add(screen);
+		Screen screen = new Screen(nes);
+		window.add(screen, BorderLayout.CENTER);
+		screen.init();
 
 		/*
 		 * Add NES handlers

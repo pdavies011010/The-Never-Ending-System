@@ -21,6 +21,17 @@ public class NES {
 		romFile = null;
 		poweredOn = false;
 
+		mmc = new MMC();
+		cpu = new CPU(mmc);
+		ppu = new PPU(mmc);
+
+		/*
+		 * MMC needs access to the CPU / PPU for access to registers via IO
+		 * ports, and to allow it to generate NMI's etc.
+		 */
+		mmc.setCPU(cpu);
+		mmc.setPPU(ppu);
+
 		eventHandlers = new HashMap<Class<? extends NESEvent>, List<INESHandler>>();
 
 		addDebugCommands();
@@ -34,6 +45,18 @@ public class NES {
 
 	public ROMFile getROMFile() {
 		return romFile;
+	}
+
+	public MMC getMMC() {
+		return mmc;
+	}
+
+	public CPU getCPU() {
+		return cpu;
+	}
+
+	public PPU getPPU() {
+		return ppu;
 	}
 
 	/*
@@ -57,17 +80,6 @@ public class NES {
 	public void powerOn() {
 		if (romFile == null)
 			return;
-
-		mmc = new MMC();
-		cpu = new CPU(mmc);
-		ppu = new PPU(mmc);
-
-		/*
-		 * MMC needs access to the CPU / PPU for access to registers via IO
-		 * ports, and to allow it to generate NMI's etc.
-		 */
-		mmc.setCPU(cpu);
-		mmc.setPPU(ppu);
 
 		ppu.setNameTableMirroring((short) romFile.getMirroring());
 
