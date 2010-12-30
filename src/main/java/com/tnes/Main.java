@@ -172,6 +172,7 @@ public class Main {
 		debug.addActionListener(new Main.NESAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				debugger.setDebugging(true);
 				debugger.readCommands();
 			}
 		});
