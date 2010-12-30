@@ -420,8 +420,10 @@ public class PPU {
 							short spritePatternTableByte1 = mmc.readPPUMem(getSpritePatternTableAddress() + PPUHelper.getPatternTableByte1Index(spritePatternTableIndex, trueScanline - spriteY));
 							short spritePatternTableByte2 = mmc.readPPUMem(getSpritePatternTableAddress() + PPUHelper.getPatternTableByte2Index(spritePatternTableIndex, trueScanline - spriteY));
 
-							paletteIndex |= ((spritePatternTableByte1 & PPUHelper.PATTERN_TABLE_BIT_MASK[scanlineCycle - spriteX]) >> PPUHelper.PATTERN_TABLE_BYTE1_BIT_SHIFT[scanlineCycle - spriteX]);
-							paletteIndex |= ((spritePatternTableByte2 & PPUHelper.PATTERN_TABLE_BIT_MASK[scanlineCycle - spriteX]) >> PPUHelper.PATTERN_TABLE_BYTE2_BIT_SHIFT[scanlineCycle - spriteX]);
+							int spriteXOffset = scanlineCycle - spriteX;
+							int maskAndShiftIndex = (spriteXOffset < 0) ? (8 + spriteXOffset) : spriteXOffset;
+							paletteIndex |= ((spritePatternTableByte1 & PPUHelper.PATTERN_TABLE_BIT_MASK[maskAndShiftIndex]) >> PPUHelper.PATTERN_TABLE_BYTE1_BIT_SHIFT[maskAndShiftIndex]);
+							paletteIndex |= ((spritePatternTableByte2 & PPUHelper.PATTERN_TABLE_BIT_MASK[maskAndShiftIndex]) >> PPUHelper.PATTERN_TABLE_BYTE2_BIT_SHIFT[maskAndShiftIndex]);
 							paletteIndex |= ((spriteFlags & 0x3) << 2);
 
 							if (scanlineCycle < 8) {
@@ -535,7 +537,7 @@ public class PPU {
 
 			int y = bytes[0] + 1;
 			int x = bytes[3];
-			if ((y >= yRangeMin && y <= yRangeMax) && (x >= xRangeMin && x <= xRangeMax)) {
+			if ((y >= yRangeMin && y < yRangeMax) && (x >= xRangeMin && x < xRangeMax)) {
 				result.add(bytes);
 			}
 		}

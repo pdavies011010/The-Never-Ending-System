@@ -36,7 +36,7 @@ public class ROMFile extends File {
 			// Read in remaining 8 header bytes and discard
 			byte[] remaining = new byte[8];
 			stream.read(remaining, 0, 8);
-			
+
 			// Load PRG-ROM and CHR-Pages into object variables
 			prgROMPages = new ArrayList<List<Short>>(prgPageCount);
 			chrROMPages = new ArrayList<List<Short>>(chrPageCount);
@@ -46,13 +46,13 @@ public class ROMFile extends File {
 				prgROMPages.add(i, new ArrayList<Short>(Constants.PRG_ROM_PAGE_SIZE));
 				for (int j = 0; j < Constants.PRG_ROM_PAGE_SIZE; j++) {
 					prgROMPages.get(i).add(j, (short) stream.read());
-					
+
 					if (prgROMPages.get(i).get(j) > 0xFF)
 						debugger.debugPrint("\nChar Value over 0xFF: " + prgROMPages.get(i).get(j));
 				}
 			}
 
-			// Read in data for PRG-ROM pages
+			// Read in data for CHR-ROM pages
 			for (int i = 0; i < chrPageCount; i++) {
 				chrROMPages.add(i, new ArrayList<Short>(Constants.CHR_ROM_PAGE_SIZE));
 				for (int j = 0; j < Constants.CHR_ROM_PAGE_SIZE; j++) {

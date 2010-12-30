@@ -417,6 +417,14 @@ public class MMC {
 				// Toggle switch
 				ppuMemAddressRegSwitch = (!ppuMemAddressRegSwitch);
 			} else if (trueAddress == Constants.PPU_MEM_DATA_PORT) {
+				/*
+				 * if (ppu.getPPUMemAddr() == 0x23DF) {
+				 * debugger.debugPrint("\nAbout to write to addr: 0x23DF");
+				 * debugger.readCommands(); }
+				 */
+				// debugger.debugLog(String.format("\nWriting 0x%s to PPU address 0x%s",
+				// Debugger.shortToHex(value),
+				// Debugger.intToHex(ppu.getPPUMemAddr())));
 				writePPUMem(ppu.getPPUMemAddr(), value);
 				if (ppu.isVerticalRWFlagSet())
 					ppu.setPPUMemAddr(ppu.getPPUMemAddr() + 32);

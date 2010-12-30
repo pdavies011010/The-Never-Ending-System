@@ -9,10 +9,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +33,7 @@ public class Debugger {
 		this.commands = new HashMap<String, DebuggerCommand>();
 		this.logFile = new File(logFileName);
 		if (this.logFile.exists()) {
-			SimpleDateFormat formatter = new SimpleDateFormat("_hhmmss_MMddyyyy");
-			this.logFile.renameTo(new File(logFileName + formatter.format(new Date())));
+			this.logFile.delete();
 		}
 		this.logFile.createNewFile();
 	}

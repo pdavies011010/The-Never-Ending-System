@@ -310,6 +310,7 @@ public class CPU {
 			data = getInstructionData(operation, addressingMode);
 			setCarryFlag((data & 0x80) != 0);
 			data <<= 1;
+			data &= 0xFF;
 			calcZeroFlag(data);
 			calcSignFlag(data);
 			if (addressingMode == AddressingMode.ACCUMULATOR) {
