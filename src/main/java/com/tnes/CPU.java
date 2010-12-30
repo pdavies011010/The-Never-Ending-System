@@ -683,15 +683,15 @@ public class CPU {
 			flags = pop();
 			// Pop low byte first
 			data = (short) (pop() & 0xFF);
-			data |= (pop() << 8);
-			pc = data;
+			data |= (short) ((pop() & 0xFF) << 8);
+			pc = (data & 0xFFFF);
 			break;
 
 		case RTS:
 			// Pop low byte first
 			data = (short) (pop() & 0xFF);
-			data |= (pop() << 8);
-			pc = data + 1;
+			data |= (short) ((pop() & 0xFF) << 8);
+			pc = ((data + 1) & 0xFFFF);
 			break;
 
 		case SBC:
@@ -839,7 +839,6 @@ public class CPU {
 	 * Utility Methods
 	 */
 	private int getInstructionAddress(Operation operation, AddressingMode addressingMode) {
-
 		switch (addressingMode) {
 		case IMMEDIATE:
 			return getImmediateAddress();
@@ -1110,8 +1109,15 @@ public class CPU {
 		 * Address and Data have to be passed in, because reading from the mem
 		 * map can change what's in memory.
 		 */
-		int address = Integer.parseInt(param.split(",")[0]);
-		short data = Byte.parseByte(param.split(",")[1]);
+		int address = 0;
+		short data = 0;
+		String[] paramArray = param.split(",");
+		if (paramArray != null && paramArray.length > 0 && paramArray[0] != null && !paramArray[0].isEmpty()) {
+			address = Integer.parseInt(paramArray[0]);
+		}
+		if (paramArray != null && paramArray.length > 1 && paramArray[1] != null && !paramArray[1].isEmpty()) {
+			data = Short.parseShort(paramArray[1]);
+		}
 
 		debugger.debugPrint(String.format("\nOperation: %s  Addressing Mode: %s  Address: %s  Data: %s", operation.toString(), addressingMode.toString(), Debugger.intToHex(address), Debugger.shortToHex(data)));
 		debugger.debugPrint(String.format("\nPC: %s  SP: %s  A: %s  X: %s  Y: %s", Debugger.intToHex(pc), Debugger.shortToHex(sp), Debugger.shortToHex(a), Debugger.shortToHex(x), Debugger.shortToHex(y)));
@@ -1127,8 +1133,15 @@ public class CPU {
 		 * Address and Data have to be passed in, because reading from the mem
 		 * map can change what's in memory.
 		 */
-		int address = Integer.parseInt(param.split(",")[0]);
-		short data = Byte.parseByte(param.split(",")[1]);
+		int address = 0;
+		short data = 0;
+		String[] paramArray = param.split(",");
+		if (paramArray != null && paramArray.length > 0 && paramArray[0] != null && !paramArray[0].isEmpty()) {
+			address = Integer.parseInt(paramArray[0]);
+		}
+		if (paramArray != null && paramArray.length > 1 && paramArray[1] != null && !paramArray[1].isEmpty()) {
+			data = Short.parseShort(paramArray[1]);
+		}
 
 		debugger.debugLog(String.format("\nOperation: %s  Addressing Mode: %s  Address: %s  Data: %s", operation.toString(), addressingMode.toString(), Debugger.intToHex(address), Debugger.shortToHex(data)));
 		debugger.debugLog(String.format("\nPC: %s  SP: %s  A: %s  X: %s  Y: %s", Debugger.intToHex(pc), Debugger.shortToHex(sp), Debugger.shortToHex(a), Debugger.shortToHex(x), Debugger.shortToHex(y)));

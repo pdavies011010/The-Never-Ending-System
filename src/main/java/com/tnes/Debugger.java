@@ -83,7 +83,7 @@ public class Debugger {
 			writer.write(text);
 			writer.close();
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println("Exception occurred during logging: " + e.getMessage());
 		}
 	}
 
@@ -153,7 +153,7 @@ public class Debugger {
 		try {
 			method.invoke(contextObject, param);
 		} catch (Exception e) {
-			debugPrint(e.getMessage());
+			debugPrint("\nException occurred during command execution: " + e.getMessage());
 		}
 	}
 
