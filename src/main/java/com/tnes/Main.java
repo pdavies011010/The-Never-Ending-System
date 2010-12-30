@@ -48,6 +48,7 @@ public class Main {
 		final JMenuItem loadROM = new JMenuItem(resourceBundle.getString("com.tnes.menu.system.loadROM"));
 		final JCheckBoxMenuItem power = new JCheckBoxMenuItem(resourceBundle.getString("com.tnes.menu.system.power"));
 		final JMenuItem reset = new JMenuItem(resourceBundle.getString("com.tnes.menu.system.reset"));
+		final JMenuItem exit = new JMenuItem(resourceBundle.getString("com.tnes.menu.system.exit"));
 
 		final JMenu dev = new JMenu(resourceBundle.getString("com.tnes.menu.dev"));
 		final JCheckBoxMenuItem paletteViewer = new JCheckBoxMenuItem(resourceBundle.getString("com.tnes.menu.dev.paletteViewer"));
@@ -125,9 +126,18 @@ public class Main {
 		});
 		reset.setText(resourceBundle.getString("com.tnes.menu.system.reset"));
 
+		exit.addActionListener(new Main.NESAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		exit.setText(resourceBundle.getString("com.tnes.menu.system.exit"));
+
 		system.add(loadROM);
 		system.add(power);
 		system.add(reset);
+		system.add(exit);
 		menuBar.add(system);
 
 		/*
