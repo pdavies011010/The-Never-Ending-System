@@ -17,9 +17,9 @@ public class Screen extends PApplet {
 	private boolean patternTableViewerShown = false;
 	private PImage canvasImage;
 
+	private int scaleModifier = 2;
+
 	// Game Canvas Area
-	private int CANVAS_X = 0;
-	private int CANVAS_Y = 0;
 	private int CANVAS_W = 256;
 	private int CANVAS_H = 241;
 
@@ -49,6 +49,14 @@ public class Screen extends PApplet {
 		addDebugCommands();
 	}
 
+	public int getWidth() {
+		return CANVAS_W * scaleModifier;
+	}
+
+	public int getHeight() {
+		return ((CANVAS_H + BOTTOM_PANEL_H) * scaleModifier);
+	}
+
 	public boolean isPaletteViewerShown() {
 		return paletteViewerShown;
 	}
@@ -67,11 +75,7 @@ public class Screen extends PApplet {
 
 	@Override
 	public void setup() {
-		size(356, 300, P2D);
-
-		// Bottom Panel
-		fill(0xFF, 0xFF, 0xFF);
-		rect(BOTTOM_PANEL_X, BOTTOM_PANEL_Y, BOTTOM_PANEL_W, BOTTOM_PANEL_H);
+		size(CANVAS_W * scaleModifier, (CANVAS_H + BOTTOM_PANEL_H) * scaleModifier, P2D);
 
 		// NTSC refresh rate (Should Be) 1/30 of a second
 		frameRate(30);
@@ -122,19 +126,57 @@ public class Screen extends PApplet {
 	}
 
 	public void draw() {
-		if (canvasImage != null)
-			image(canvasImage, CANVAS_X, CANVAS_Y, CANVAS_W, CANVAS_H);
+		if (canvasImage != null) {
+			image(canvasImage, 0, 0, CANVAS_W * scaleModifier, CANVAS_H * scaleModifier);
+		}
 
 		if (paletteViewerShown && paletteViewer != null && paletteViewer.getImage() != null) {
-			image(paletteViewer.getImage(), PALETTE_VIEWER_X, PALETTE_VIEWER_Y, PALETTE_VIEWER_W, PALETTE_VIEWER_H);
+			image(paletteViewer.getImage(), PALETTE_VIEWER_X, PALETTE_VIEWER_Y * scaleModifier, PALETTE_VIEWER_W * scaleModifier, PALETTE_VIEWER_H * scaleModifier);
 		} else {
-			fill(0xFF, 0xFF, 0xFF);
-			rect(BOTTOM_PANEL_X, BOTTOM_PANEL_Y, BOTTOM_PANEL_W, BOTTOM_PANEL_H);
+			fill(0xAA, 0xAA, 0xAA);
+			rect(BOTTOM_PANEL_X, BOTTOM_PANEL_Y * scaleModifier, BOTTOM_PANEL_W * scaleModifier, BOTTOM_PANEL_H * scaleModifier);
 		}
 
 		if (patternTableViewerShown && patternTablesViewer != null && patternTablesViewer.getImage() != null)
-			image(patternTablesViewer.getImage(), PATTERN_TABLE_VIEWER_X, PATTERN_TABLE_VIEWER_Y, PATTERN_TABLE_VIEWER_W, PATTERN_TABLE_VIEWER_H);
+			image(patternTablesViewer.getImage(), PATTERN_TABLE_VIEWER_X, PATTERN_TABLE_VIEWER_Y * scaleModifier, PATTERN_TABLE_VIEWER_W * scaleModifier, PATTERN_TABLE_VIEWER_H * scaleModifier);
 
+	}
+
+	public void keyPressed() {
+		MMC mmc = nes.getMMC();
+
+		// TODO: Put in handling for second joystick, enable user key selection
+		if (key == CODED) {
+			switch (keyCode) {
+			case UP:
+				mmc.setJoystick1Keys((short) (mmc.getJoystick1Keys() | Constants.JOYSTICK_UP));
+				break;
+			case DOWN:
+				mmc.setJoystick1Keys((short) (mmc.getJoystick1Keys() | Constants.JOYSTICK_DOWN));
+				break;
+			case LEFT:
+				mmc.setJoystick1Keys((short) (mmc.getJoystick1Keys() | Constants.JOYSTICK_LEFT));
+				break;
+			case RIGHT:
+				mmc.setJoystick1Keys((short) (mmc.getJoystick1Keys() | Constants.JOYSTICK_RIGHT));
+				break;
+			}
+		} else {
+			switch (Character.toUpperCase(key)) {
+			case 'A':
+				mmc.setJoystick1Keys((short) (mmc.getJoystick1Keys() | Constants.JOYSTICK_B));
+				break;
+			case 'S':
+				mmc.setJoystick1Keys((short) (mmc.getJoystick1Keys() | Constants.JOYSTICK_A));
+				break;
+			case 'Z':
+				mmc.setJoystick1Keys((short) (mmc.getJoystick1Keys() | Constants.JOYSTICK_SELECT));
+				break;
+			case 'X':
+				mmc.setJoystick1Keys((short) (mmc.getJoystick1Keys() | Constants.JOYSTICK_START));
+				break;
+			}
+		}
 	}
 
 	/*

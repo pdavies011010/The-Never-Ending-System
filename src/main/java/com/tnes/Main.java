@@ -57,7 +57,7 @@ public class Main {
 		/*
 		 * Build the window
 		 */
-		window.setSize(256, 321);
+		window.setSize(screen.getWidth(), screen.getHeight());
 		window.setVisible(true);
 		window.setLayout(new BorderLayout());
 		window.setJMenuBar(menuBar);
