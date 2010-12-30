@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 import com.tnes.NES.IPowerOffHandler;
 import com.tnes.NES.IPowerOnHandler;
@@ -33,16 +34,25 @@ public class Main {
 
 	public static void main(String[] args) {
 		final NES nes = new NES();
+		final Screen screen = new Screen(nes);
 		final Debugger debugger = Debugger.getInstance();
 		boolean debugging = false;
 
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+
 		final ResourceBundle resourceBundle = ResourceBundle.getBundle("tnes");
 		final JFrame window = new JFrame(resourceBundle.getString("com.tnes.windowTitle"));
+
 		final JMenuBar menuBar = new JMenuBar();
 		final JMenu system = new JMenu(resourceBundle.getString("com.tnes.menu.system"));
 		final JMenuItem loadROM = new JMenuItem(resourceBundle.getString("com.tnes.menu.system.loadROM"));
 		final JCheckBoxMenuItem power = new JCheckBoxMenuItem(resourceBundle.getString("com.tnes.menu.system.power"));
 		final JMenuItem reset = new JMenuItem(resourceBundle.getString("com.tnes.menu.system.reset"));
+
+		final JMenu dev = new JMenu(resourceBundle.getString("com.tnes.menu.dev"));
+		final JCheckBoxMenuItem paletteViewer = new JCheckBoxMenuItem(resourceBundle.getString("com.tnes.menu.dev.paletteViewer"));
+		final JCheckBoxMenuItem patternTableViewer = new JCheckBoxMenuItem(resourceBundle.getString("com.tnes.menu.dev.patternTableViewer"));
+		final JMenuItem debug = new JMenuItem(resourceBundle.getString("com.tnes.menu.dev.debug"));
 
 		/*
 		 * Build the window
@@ -50,6 +60,7 @@ public class Main {
 		window.setSize(256, 321);
 		window.setVisible(true);
 		window.setLayout(new BorderLayout());
+		window.setJMenuBar(menuBar);
 
 		/*
 		 * Drop the user back into the debugger if the window is closed. TODO:
@@ -68,9 +79,9 @@ public class Main {
 			}
 		});
 
-		// Build the menu bar
-		window.setJMenuBar(menuBar);
-
+		/*
+		 * Build the system menu
+		 */
 		loadROM.addActionListener(new Main.NESAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -114,16 +125,57 @@ public class Main {
 		});
 		reset.setText(resourceBundle.getString("com.tnes.menu.system.reset"));
 
-		// Build the system menu
 		system.add(loadROM);
 		system.add(power);
 		system.add(reset);
 		menuBar.add(system);
 
+		/*
+		 * Build the dev menu
+		 */
+		paletteViewer.setSelected(screen.isPaletteViewerShown());
+		paletteViewer.addItemListener(new Main.NESToggleAction() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED && !screen.isPaletteViewerShown()) {
+					screen.setPaletteViewerShown(true);
+				} else if (e.getStateChange() == ItemEvent.DESELECTED && screen.isPaletteViewerShown()) {
+					screen.setPaletteViewerShown(false);
+				}
+			}
+		});
+		paletteViewer.setText(resourceBundle.getString("com.tnes.menu.dev.paletteViewer"));
+
+		patternTableViewer.setSelected(screen.isPatternTableViewerShown());
+		patternTableViewer.addItemListener(new Main.NESToggleAction() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED && !screen.isPatternTableViewerShown()) {
+					screen.setPatternTableViewerShown(true);
+				} else if (e.getStateChange() == ItemEvent.DESELECTED && screen.isPatternTableViewerShown()) {
+					screen.setPatternTableViewerShown(false);
+				}
+			}
+		});
+		patternTableViewer.setText(resourceBundle.getString("com.tnes.menu.dev.patternTableViewer"));
+
+		debug.addActionListener(new Main.NESAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				debugger.readCommands();
+			}
+		});
+		debug.setText(resourceBundle.getString("com.tnes.menu.dev.debug"));
+
+		dev.add(paletteViewer);
+		dev.add(patternTableViewer);
+		dev.add(debug);
+		menuBar.add(dev);
+
 		// Build Processing screen
-		Screen screen = new Screen(nes);
 		window.add(screen, BorderLayout.CENTER);
 		screen.init();
+		window.setVisible(true);
 
 		/*
 		 * Add NES handlers
