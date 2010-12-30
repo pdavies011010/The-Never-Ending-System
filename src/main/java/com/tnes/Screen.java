@@ -126,8 +126,11 @@ public class Screen extends PApplet {
 	}
 
 	public void draw() {
-		if (canvasImage != null) {
+		if (nes.isPoweredOn() && canvasImage != null) {
 			image(canvasImage, 0, 0, CANVAS_W * scaleModifier, CANVAS_H * scaleModifier);
+		} else {
+			fill(0x00, 0x00, 0x00);
+			rect(0, 0, CANVAS_W * scaleModifier, CANVAS_H * scaleModifier);
 		}
 
 		if (paletteViewerShown && paletteViewer != null && paletteViewer.getImage() != null) {
