@@ -388,9 +388,9 @@ public class PPU {
 				// Draw screen
 				int paletteIndex = 0;
 				if (isScreenEnableFlagSet()) {
-					paletteIndex |= ((patternTableByte1 & PPUHelper.PATTERN_TABLE_BIT_MASK[tilePixel]) >> PPUHelper.PATTERN_TABLE_BYTE1_BIT_SHIFT[tilePixel]);
-					paletteIndex |= ((patternTableByte2 & PPUHelper.PATTERN_TABLE_BIT_MASK[tilePixel]) >> PPUHelper.PATTERN_TABLE_BYTE2_BIT_SHIFT[tilePixel]);
-					paletteIndex |= ((attributeTableByte & PPUHelper.ATTRIBUTE_TABLE_BIT_MASK[attributeTableSquare]) >> PPUHelper.ATTRIBUTE_TABLE_BIT_SHIFT[attributeTableSquare]);
+					paletteIndex |= PPUHelper.rightShift((short) (patternTableByte1 & PPUHelper.PATTERN_TABLE_BIT_MASK[tilePixel]), PPUHelper.PATTERN_TABLE_BYTE1_BIT_SHIFT[tilePixel]);
+					paletteIndex |= PPUHelper.rightShift((short) (patternTableByte2 & PPUHelper.PATTERN_TABLE_BIT_MASK[tilePixel]), PPUHelper.PATTERN_TABLE_BYTE2_BIT_SHIFT[tilePixel]);
+					paletteIndex |= PPUHelper.rightShift((short) (attributeTableByte & PPUHelper.ATTRIBUTE_TABLE_BIT_MASK[attributeTableSquare]), PPUHelper.ATTRIBUTE_TABLE_BIT_SHIFT[attributeTableSquare]);
 
 					if (scanlineCycle < 8) {
 						if (!isImageMaskFlagSet()) {
@@ -422,8 +422,8 @@ public class PPU {
 
 							int spriteXOffset = scanlineCycle - spriteX;
 							int maskAndShiftIndex = (spriteXOffset < 0) ? (8 + spriteXOffset) : spriteXOffset;
-							paletteIndex |= ((spritePatternTableByte1 & PPUHelper.PATTERN_TABLE_BIT_MASK[maskAndShiftIndex]) >> PPUHelper.PATTERN_TABLE_BYTE1_BIT_SHIFT[maskAndShiftIndex]);
-							paletteIndex |= ((spritePatternTableByte2 & PPUHelper.PATTERN_TABLE_BIT_MASK[maskAndShiftIndex]) >> PPUHelper.PATTERN_TABLE_BYTE2_BIT_SHIFT[maskAndShiftIndex]);
+							paletteIndex |= PPUHelper.rightShift((short) (spritePatternTableByte1 & PPUHelper.PATTERN_TABLE_BIT_MASK[maskAndShiftIndex]), PPUHelper.PATTERN_TABLE_BYTE1_BIT_SHIFT[maskAndShiftIndex]);
+							paletteIndex |= PPUHelper.rightShift((short) (spritePatternTableByte2 & PPUHelper.PATTERN_TABLE_BIT_MASK[maskAndShiftIndex]), PPUHelper.PATTERN_TABLE_BYTE2_BIT_SHIFT[maskAndShiftIndex]);
 							paletteIndex |= ((spriteFlags & 0x3) << 2);
 
 							if (scanlineCycle < 8) {

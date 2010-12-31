@@ -34,4 +34,12 @@ public class PPUHelper {
 		square += ((tileIndex % 4) >= 2) ? 1 : 0;
 		return square;
 	}
+
+	public static short rightShift(short byte1, short distance) {
+		if (distance >= 0) {
+			return (short) (byte1 >> distance);
+		} else {
+			return (short) (byte1 << Math.abs(distance));
+		}
+	}
 }
